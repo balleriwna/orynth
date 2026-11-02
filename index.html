@@ -22,7 +22,8 @@
               navy: '#0F172A',
               deepnavy: '#1E293B',
               accent: '#7CB9E8',
-              yellow: '#F7E8AC'
+              yellow: '#F7E8AC',
+              pink: '#FDE2E4'
             }
           },
           fontFamily: {
@@ -32,7 +33,7 @@
           boxShadow: {
             soft: '0 12px 30px -5px rgba(144, 200, 239, 0.35), 0 8px 15px -6px rgba(15, 23, 42, 0.05)',
             polaroid: '0 18px 40px -5px rgba(15, 23, 42, 0.15)',
-            scrapbook: '5px 5px 0px 0px #90C8EF'
+            glow: '0 0 30px rgba(144, 200, 239, 0.6)'
           }
         }
       }
@@ -59,9 +60,9 @@
     body {
       background-color: #FAF9F5;
       background-image: 
-        linear-gradient(to right, rgba(144, 200, 239, 0.18) 1px, transparent 1px),
-        linear-gradient(to bottom, rgba(144, 200, 239, 0.18) 1px, transparent 1px);
-      background-size: 24px 24px;
+        linear-gradient(to right, rgba(144, 200, 239, 0.2) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(144, 200, 239, 0.2) 1px, transparent 1px);
+      background-size: 26px 26px;
     }
 
     ::-webkit-scrollbar { width: 8px; }
@@ -70,16 +71,16 @@
     ::-webkit-scrollbar-thumb:hover { background: #90C8EF; }
 
     .washi-tape-blue {
-      background: rgba(186, 224, 245, 0.85);
-      border-left: 3px dashed rgba(144, 200, 239, 0.6);
-      border-right: 3px dashed rgba(144, 200, 239, 0.6);
-      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+      background: rgba(186, 224, 245, 0.9);
+      border-left: 3px dashed rgba(144, 200, 239, 0.7);
+      border-right: 3px dashed rgba(144, 200, 239, 0.7);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.06);
     }
     .washi-tape-yellow {
-      background: rgba(247, 232, 172, 0.85);
-      border-left: 3px dashed rgba(240, 201, 98, 0.6);
-      border-right: 3px dashed rgba(240, 201, 98, 0.6);
-      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+      background: rgba(247, 232, 172, 0.9);
+      border-left: 3px dashed rgba(240, 201, 98, 0.7);
+      border-right: 3px dashed rgba(240, 201, 98, 0.7);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.06);
     }
 
     .stpageflip-container {
@@ -107,21 +108,30 @@
       z-index: 10;
     }
 
+    @keyframes floatUp {
+      0% { transform: translateY(100vh) scale(0.8) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(-120vh) scale(1.2) rotate(20deg); opacity: 0; }
+    }
+    .balloon-particle {
+      position: fixed;
+      bottom: -50px;
+      z-index: 9999;
+      pointer-events: none;
+      animation: floatUp 6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+    }
+
     @keyframes spinSlow {
       from { transform: rotate(0deg); }
       to { transform: rotate(360deg); }
     }
-    .animate-spin-slow {
-      animation: spinSlow 12s linear infinite;
-    }
+    .animate-spin-slow { animation: spinSlow 10s linear infinite; }
 
     @keyframes floatSticker {
       0%, 100% { transform: translateY(0px) rotate(0deg); }
-      50% { transform: translateY(-10px) rotate(4deg); }
+      50% { transform: translateY(-12px) rotate(6deg); }
     }
-    .animate-float-1 { animation: floatSticker 4s ease-in-out infinite; }
-    .animate-float-2 { animation: floatSticker 5s ease-in-out infinite 1.5s; }
-    .animate-float-3 { animation: floatSticker 4.5s ease-in-out infinite 0.8s; }
+    .animate-float-1 { animation: floatSticker 3.5s ease-in-out infinite; }
+    .animate-float-2 { animation: floatSticker 4.5s ease-in-out infinite 1s; }
   </style>
 </head>
 <body class="bg-pastel-offwhite text-pastel-navy font-sans antialiased overflow-x-hidden selection:bg-pastel-powder selection:text-pastel-navy">
@@ -131,7 +141,7 @@
   <script type="text/babel">
     const { useState, useRef, useEffect } = React;
 
-    // PATH SESUAI UPLOAD FILE DIRECTORY GITHUB SAAT INI
+    // PATH SESUAI UPLOAD ROOT GITHUB KAMU
     const images = {
       profile: "profilekalan.jpeg",
       header: "headerbanner.jpeg",
@@ -169,24 +179,23 @@
       { id: "j", title: "Open when you need a gentle reminder", content: "You matter, your feelings are completely valid, and you are doing so much better than you give yourself credit for. Be extra soft and kind to yourself today, because you are trying your best every single day, and that alone is something to be proud of." }
     ];
 
-    const FlowerSticker = () => (
-      <svg className="w-8 h-8 text-pastel-powder animate-float-1" viewBox="0 0 24 24" fill="currentColor">
-        <path d="M12 3a3 3 0 00-3 3 3 3 0 00-3-3 3 3 0 00-3 3 3 3 0 003 3 3 3 0 00-3 3 3 3 0 003 3 3 3 0 003-3 3 3 0 003 3 3 3 0 003-3 3 3 0 00-3-3 3 3 0 003-3 3 3 0 00-3-3z"/>
-      </svg>
-    );
+    // EFEK BALON TERBANG (INTERAKTIF GACOR)
+    function triggerBalloons() {
+      const colors = ['🎈', '🩵', '✨', '🌸', '🎂', '⭐', '🎁'];
+      for (let i = 0; i < 25; i++) {
+        setTimeout(() => {
+          const balloon = document.createElement('div');
+          balloon.className = 'balloon-particle text-3xl md:text-5xl';
+          balloon.innerText = colors[Math.floor(Math.random() * colors.length)];
+          balloon.style.left = Math.random() * 100 + 'vw';
+          balloon.style.animationDuration = (Math.random() * 3 + 4) + 's';
+          document.body.appendChild(balloon);
+          setTimeout(() => balloon.remove(), 7000);
+        }, i * 150);
+      }
+    }
 
-    const RibbonSticker = () => (
-      <svg className="w-7 h-7 text-pastel-baby animate-float-2" viewBox="0 0 24 24" fill="currentColor">
-        <path d="M12 2a4 4 0 00-4 4c0 2 4 6 4 6s4-4 4-6a4 4 0 00-4-4zm-6 16l4-2-2 4 4-1-6-1zm12 0l-6 1 4 1-2-4 4 2z"/>
-      </svg>
-    );
-
-    const SparkleSticker = () => (
-      <svg className="w-6 h-6 text-pastel-yellow animate-float-3" viewBox="0 0 24 24" fill="currentColor">
-        <path d="M12 0l2.5 8.5L23 11l-8.5 2.5L12 22l-2.5-8.5L1 11l8.5-2.5z"/>
-      </svg>
-    );
-
+    // IMAGE FALLBACK
     function ImageWithFallback({ src, alt, className = "" }) {
       const [error, setError] = useState(false);
       if (error || !src) {
@@ -203,12 +212,13 @@
       return <img src={src} alt={alt} onError={() => setError(true)} className={`object-contain max-w-full h-auto ${className}`} loading="lazy" />;
     }
 
+    // NAVBAR
     function Navbar() {
       const [isOpen, setIsOpen] = useState(false);
       const navItems = [
+        { name: 'Profile Header', href: '#profile' },
         { name: 'Home', href: '#home' },
         { name: 'Birthday Gift', href: '#birthday' },
-        { name: 'Memories', href: '#memories' },
         { name: 'Graduation', href: '#graduation' },
         { name: 'Music & Videos', href: '#media' },
         { name: 'Open When Letters', href: '#letters' },
@@ -217,8 +227,8 @@
       return (
         <header className="sticky top-4 z-50 max-w-5xl mx-auto px-4">
           <nav className="bg-white/90 backdrop-blur-md rounded-full px-6 py-3 shadow-soft border-2 border-pastel-powder/40 flex items-center justify-between">
-            <a href="#home" className="font-serif text-lg font-bold text-pastel-navy flex items-center gap-2">
-              <span className="bg-pastel-blue px-2.5 py-0.5 rounded-full text-xs font-mono border border-pastel-powder/50">Kalan's World 🩵</span>
+            <a href="#profile" className="font-serif text-lg font-bold text-pastel-navy flex items-center gap-2">
+              <span className="bg-pastel-blue px-3 py-1 rounded-full text-xs font-mono border border-pastel-powder/50">Kalan's World 🩵</span>
             </a>
             <div className="hidden md:flex items-center gap-6">
               {navItems.map((item) => (
@@ -244,14 +254,15 @@
       );
     }
 
+    // 1. PROFILE HEADER DI PALING ATAS (SEBAGAI HEADER UTAMA WEBSITE)
     function ProfileHeader() {
       return (
-        <div id="memories" className="max-w-4xl mx-auto px-4 my-14">
+        <div id="profile" className="max-w-4xl mx-auto px-4 mt-6 mb-12">
           <div className="bg-white/95 rounded-3xl overflow-hidden shadow-soft border-2 border-pastel-powder/40 relative">
-            <div className="h-44 md:h-56 w-full bg-pastel-blue relative overflow-hidden">
+            <div className="h-48 md:h-60 w-full bg-pastel-blue relative overflow-hidden">
               <ImageWithFallback src={images.header} alt="Header Banner" className="w-full h-full object-cover" />
-              <div className="absolute top-4 right-4 bg-white/80 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-mono font-bold text-pastel-navy border border-pastel-powder/40 shadow-sm">
-                OFFICIAL PROFILE 📌
+              <div className="absolute top-4 right-4 bg-white/85 backdrop-blur-md px-3.5 py-1.5 rounded-full text-[11px] font-mono font-bold text-pastel-navy border border-pastel-powder/40 shadow-sm flex items-center gap-1.5">
+                <span>📌</span> OFFICIAL MEMORY DASHBOARD
               </div>
             </div>
 
@@ -269,27 +280,27 @@
               </div>
 
               <div>
-                <h2 className="text-2xl font-bold font-serif text-pastel-navy flex items-center gap-2">
+                <h2 className="text-2xl md:text-3xl font-bold font-serif text-pastel-navy flex items-center gap-2">
                   Kalan <span className="text-pastel-powder">✔</span>
                 </h2>
                 <p className="text-xs text-pastel-navy/60 font-mono">@kalan</p>
 
                 <p className="text-sm text-pastel-navy/80 mt-3 leading-relaxed font-sans max-w-2xl">
-                  Living life one sweet memory at a time 🌿✨ Celebrating milestones, hard work, and good vibes.
+                  Living life one sweet memory at a time 🌿✨ Celebrating milestones, hard work, and good vibes. Welcome to my personal digital memory book!
                 </p>
 
                 <div className="grid grid-cols-3 gap-3 mt-6 pt-4 border-t border-pastel-powder/30 text-center">
-                  <div className="bg-pastel-blue/30 p-2.5 rounded-2xl border border-pastel-powder/30">
-                    <span className="block text-xs font-mono text-pastel-navy/60">CHAPTER</span>
-                    <span className="font-serif font-bold text-sm text-pastel-navy">New Degree 🎓</span>
+                  <div className="bg-pastel-blue/30 p-3 rounded-2xl border border-pastel-powder/30">
+                    <span className="block text-[10px] font-mono text-pastel-navy/60">CHAPTER</span>
+                    <span className="font-serif font-bold text-xs md:text-sm text-pastel-navy">New Degree 🎓</span>
                   </div>
-                  <div className="bg-pastel-blue/30 p-2.5 rounded-2xl border border-pastel-powder/30">
-                    <span className="block text-xs font-mono text-pastel-navy/60">FRIENDSHIP</span>
-                    <span className="font-serif font-bold text-sm text-pastel-navy">2 Years+ 🩵</span>
+                  <div className="bg-pastel-blue/30 p-3 rounded-2xl border border-pastel-powder/30">
+                    <span className="block text-[10px] font-mono text-pastel-navy/60">FRIENDSHIP</span>
+                    <span className="font-serif font-bold text-xs md:text-sm text-pastel-navy">2 Years+ 🩵</span>
                   </div>
-                  <div className="bg-pastel-blue/30 p-2.5 rounded-2xl border border-pastel-powder/30">
-                    <span className="block text-xs font-mono text-pastel-navy/60">STATUS</span>
-                    <span className="font-serif font-bold text-sm text-pastel-navy">Blessed ✨</span>
+                  <div className="bg-pastel-blue/30 p-3 rounded-2xl border border-pastel-powder/30">
+                    <span className="block text-[10px] font-mono text-pastel-navy/60">STATUS</span>
+                    <span className="font-serif font-bold text-xs md:text-sm text-pastel-navy">Blessed ✨</span>
                   </div>
                 </div>
               </div>
@@ -299,14 +310,50 @@
       );
     }
 
+    // 2. HERO SECTION
+    function HeroSection() {
+      return (
+        <section id="home" className="min-h-[70vh] flex flex-col items-center justify-center text-center px-4 py-8 relative overflow-hidden">
+          <div className="absolute top-8 left-8 text-pastel-powder animate-float-1 text-3xl">🌸</div>
+          <div className="absolute bottom-12 left-12 text-pastel-baby animate-float-2 text-3xl">🎀</div>
+          <div className="absolute top-10 right-10 text-pastel-yellow animate-float-1 text-3xl">⭐</div>
+
+          <span className="bg-pastel-blue/80 text-pastel-navy px-4 py-1.5 rounded-full border border-pastel-powder/50 text-xs font-bold mb-3 shadow-sm">
+            Hi, Kalan! ✨
+          </span>
+          <h1 className="font-serif text-4xl md:text-6xl font-bold text-pastel-navy tracking-tight leading-tight">
+            A Little World Made Just For You
+          </h1>
+          <p className="text-sm md:text-base text-pastel-navy/70 max-w-lg mx-auto mt-3 font-sans">
+            A digital memory scrapbook celebrating your birthday and graduation journey.
+          </p>
+
+          <div className="max-w-xs mx-auto my-8 p-3 bg-white rounded-3xl shadow-polaroid border-2 border-pastel-powder/40 rotate-1 hover:rotate-0 transition-transform duration-300 relative">
+            <div className="washi-tape-blue absolute -top-3 left-1/2 -translate-x-1/2 w-28 h-6 rounded-sm"></div>
+            <ImageWithFallback src={images.homepage} alt="Kalan Main" className="w-full h-auto rounded-2xl object-cover" />
+          </div>
+
+          <a 
+            href="#birthday" 
+            onClick={triggerBalloons}
+            className="bg-pastel-powder hover:bg-pastel-baby text-pastel-navy font-bold text-sm px-8 py-3.5 rounded-full shadow-md transition-all duration-300 hover:scale-105 border border-white flex items-center gap-2"
+          >
+            <span>Explore Your Surprise</span> <span>🎈</span>
+          </a>
+        </section>
+      );
+    }
+
+    // 3. BIRTHDAY GIFT SURPRISE
     function BirthdayGiftSection() {
       const [step, setStep] = useState('box');
 
       const handleOpenGift = () => {
+        triggerBalloons(); // Panggil balon terbang pas buka gift
         if (window.confetti) {
           window.confetti({
-            particleCount: 150,
-            spread: 100,
+            particleCount: 180,
+            spread: 120,
             origin: { y: 0.6 },
             colors: ['#BAE0F5', '#90C8EF', '#E2EEF9', '#FFFFFF', '#F7E8AC']
           });
@@ -319,7 +366,7 @@
           {step === 'box' && (
             <div className="bg-white/95 p-8 md:p-12 rounded-3xl border-2 border-pastel-powder/40 shadow-soft max-w-lg mx-auto flex flex-col items-center gap-6 relative overflow-hidden">
               <div className="washi-tape-yellow absolute -top-3 left-1/2 -translate-x-1/2 w-28 h-6 rounded-sm"></div>
-              <div className="w-24 h-24 bg-pastel-blue/60 rounded-full flex items-center justify-center text-4xl border-2 border-pastel-powder/50 shadow-sm animate-bounce mt-2">
+              <div className="w-24 h-24 bg-pastel-blue/60 rounded-full flex items-center justify-center text-5xl border-2 border-pastel-powder/50 shadow-sm animate-bounce mt-2">
                 🎁
               </div>
               <div>
@@ -346,7 +393,7 @@
                 <p className="text-xs md:text-sm text-pastel-navy/70 mt-2">Before reading your little surprise, here's a cake made for you.</p>
               </div>
               <button 
-                onClick={() => setStep('message')} 
+                onClick={() => { setStep('message'); triggerBalloons(); }} 
                 className="bg-pastel-powder hover:bg-pastel-baby text-pastel-navy font-bold px-8 py-3.5 rounded-full shadow-md transition-all duration-300 hover:scale-105 border border-white text-sm flex items-center gap-2"
               >
                 <span>Continue</span> <span>➔</span>
@@ -378,6 +425,7 @@ You deserve every single sweet thing this world has to offer, Kalan. Take time t
       );
     }
 
+    // 4. GRADUATION FLIPBOOK
     function GraduationFlipbookSection() {
       const bookContainerRef = useRef(null);
       const pageFlipRef = useRef(null);
@@ -416,7 +464,6 @@ You deserve every single sweet thing this world has to offer, Kalan. Take time t
 
           <div className="flex justify-center items-center my-6">
             <div ref={bookContainerRef} className="stpageflip-container">
-              
               <div className="page-sheet flex flex-col items-center justify-center text-center space-y-4">
                 <div className="washi-tape-blue absolute top-3 left-1/2 -translate-x-1/2 w-28 h-6 rounded-sm"></div>
                 <div className="w-full h-64 rounded-2xl overflow-hidden bg-pastel-blue/30 p-2 border border-pastel-powder/30">
@@ -475,7 +522,6 @@ Makasih banyak ya udah mau temenan sama gue. Makasih udah dengerin cerita-cerita
                 <h3 className="font-serif text-xl font-bold text-pastel-navy">Once again, congratulations!</h3>
                 <p className="text-xs text-pastel-navy/70">Your journey is just beginning. Keep growing, keep dreaming, and keep being you.</p>
               </div>
-
             </div>
           </div>
 
@@ -491,53 +537,7 @@ Makasih banyak ya udah mau temenan sama gue. Makasih udah dengerin cerita-cerita
       );
     }
 
-    function OpenWhenLettersSection() {
-      const [selectedLetter, setSelectedLetter] = useState(null);
-
-      return (
-        <section id="letters" className="max-w-5xl mx-auto px-4 py-16 text-center">
-          <div className="mb-8">
-            <span className="bg-pastel-blue/60 text-pastel-navy px-4 py-1.5 rounded-full border border-pastel-powder/40 text-xs font-semibold">✉️ Open When Letters</span>
-            <h2 className="font-serif text-3xl md:text-4xl font-bold text-pastel-navy mt-2">10 Special Envelopes</h2>
-            <p className="text-xs text-pastel-navy/60 mt-1">Klik salah satu amplop untuk membaca pesan personal.</p>
-          </div>
-
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
-            {lettersData.map((letter) => (
-              <button
-                key={letter.id}
-                onClick={() => setSelectedLetter(letter)}
-                className="bg-white hover:bg-pastel-blue/40 p-4 rounded-2xl border-2 border-pastel-powder/40 shadow-soft flex flex-col items-center gap-2 text-center transition-all duration-300 hover:-translate-y-1.5 group relative overflow-hidden"
-              >
-                <div className="w-10 h-10 bg-pastel-blue rounded-full flex items-center justify-center text-lg group-hover:scale-110 transition-transform">
-                  ✉️
-                </div>
-                <span className="font-serif text-xs font-bold text-pastel-navy line-clamp-2">{letter.title}</span>
-              </button>
-            ))}
-          </div>
-
-          {selectedLetter && (
-            <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4">
-              <div className="bg-white rounded-3xl p-6 md:p-8 max-w-lg w-full border-2 border-pastel-powder shadow-2xl text-left relative">
-                <button onClick={() => setSelectedLetter(null)} className="absolute top-4 right-4 text-pastel-navy/50 hover:text-pastel-navy text-lg font-bold">✕</button>
-                <span className="text-xs font-semibold uppercase tracking-wider text-pastel-powder font-mono">Envelope #{selectedLetter.id.toUpperCase()}</span>
-                <h3 className="font-serif text-xl font-bold text-pastel-navy my-2 border-b border-pastel-powder/30 pb-2">{selectedLetter.title}</h3>
-                <div className="bg-pastel-blue/20 p-5 rounded-2xl border border-pastel-powder/30 text-sm text-pastel-navy/80 leading-relaxed font-sans">
-                  {selectedLetter.content}
-                </div>
-                <div className="mt-6 text-right">
-                  <button onClick={() => setSelectedLetter(null)} className="bg-pastel-powder hover:bg-pastel-baby text-pastel-navy text-xs font-bold px-6 py-2.5 rounded-full shadow-sm">
-                    Close Letter
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
-        </section>
-      );
-    }
-
+    // 5. MEDIA SECTION (VIDEO DENGAN EFEK BALON TERBANG)
     function MediaSection() {
       const [currentSong, setCurrentSong] = useState(musicList[0]);
       const [isPlaying, setIsPlaying] = useState(false);
@@ -553,6 +553,10 @@ Makasih banyak ya udah mau temenan sama gue. Makasih udah dengerin cerita-cerita
         setIsPlaying(!isPlaying);
       };
 
+      const handleVideoPlay = () => {
+        triggerBalloons(); // Balon terbang saat video diputar!
+      };
+
       return (
         <section id="media" className="max-w-5xl mx-auto px-4 py-16">
           <div className="text-center mb-10">
@@ -560,6 +564,7 @@ Makasih banyak ya udah mau temenan sama gue. Makasih udah dengerin cerita-cerita
             <h2 className="font-serif text-3xl md:text-4xl font-bold text-pastel-navy mt-2">Music & Videos</h2>
           </div>
 
+          {/* Pemutar Musik */}
           <div className="bg-white/90 p-6 rounded-3xl border-2 border-pastel-powder/40 shadow-soft max-w-xl mx-auto mb-12 relative overflow-hidden">
             <div className="washi-tape-blue absolute -top-3 left-1/2 -translate-x-1/2 w-28 h-6 rounded-sm"></div>
             <audio ref={audioRef} src={currentSong.src} onEnded={() => setIsPlaying(false)} />
@@ -593,11 +598,18 @@ Makasih banyak ya udah mau temenan sama gue. Makasih udah dengerin cerita-cerita
             </div>
           </div>
 
+          {/* GALERI VIDEO (MURNI VIDEO + INTERAKSI BALON TERBANG) */}
           <div className="grid md:grid-cols-2 gap-6">
             {videoList.map((video) => (
-              <div key={video.id} className="bg-white/95 p-3 rounded-3xl border-2 border-pastel-powder/40 shadow-soft overflow-hidden">
+              <div key={video.id} className="bg-white/95 p-3 rounded-3xl border-2 border-pastel-powder/40 shadow-soft overflow-hidden group">
                 <div className="aspect-video rounded-2xl overflow-hidden bg-slate-900">
-                  <video src={video.src} poster={video.thumbnail} controls className="w-full h-full object-contain" />
+                  <video 
+                    src={video.src} 
+                    poster={video.thumbnail} 
+                    controls 
+                    onPlay={handleVideoPlay}
+                    className="w-full h-full object-contain" 
+                  />
                 </div>
               </div>
             ))}
@@ -606,43 +618,75 @@ Makasih banyak ya udah mau temenan sama gue. Makasih udah dengerin cerita-cerita
       );
     }
 
+    // 6. OPEN WHEN LETTERS
+    function OpenWhenLettersSection() {
+      const [selectedLetter, setSelectedLetter] = useState(null);
+
+      const openEnvelope = (letter) => {
+        setSelectedLetter(letter);
+        triggerBalloons(); // Efek balon terbang saat amplop dibuka
+      };
+
+      return (
+        <section id="letters" className="max-w-5xl mx-auto px-4 py-16 text-center">
+          <div className="mb-8">
+            <span className="bg-pastel-blue/60 text-pastel-navy px-4 py-1.5 rounded-full border border-pastel-powder/40 text-xs font-semibold">✉️ Open When Letters</span>
+            <h2 className="font-serif text-3xl md:text-4xl font-bold text-pastel-navy mt-2">10 Special Envelopes</h2>
+            <p className="text-xs text-pastel-navy/60 mt-1">Klik salah satu amplop untuk membaca pesan personal.</p>
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+            {lettersData.map((letter) => (
+              <button
+                key={letter.id}
+                onClick={() => openEnvelope(letter)}
+                className="bg-white hover:bg-pastel-blue/40 p-4 rounded-2xl border-2 border-pastel-powder/40 shadow-soft flex flex-col items-center gap-2 text-center transition-all duration-300 hover:-translate-y-1.5 group relative overflow-hidden"
+              >
+                <div className="w-10 h-10 bg-pastel-blue rounded-full flex items-center justify-center text-lg group-hover:scale-110 transition-transform">
+                  ✉️
+                </div>
+                <span className="font-serif text-xs font-bold text-pastel-navy line-clamp-2">{letter.title}</span>
+              </button>
+            ))}
+          </div>
+
+          {selectedLetter && (
+            <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4">
+              <div className="bg-white rounded-3xl p-6 md:p-8 max-w-lg w-full border-2 border-pastel-powder shadow-2xl text-left relative">
+                <button onClick={() => setSelectedLetter(null)} className="absolute top-4 right-4 text-pastel-navy/50 hover:text-pastel-navy text-lg font-bold">✕</button>
+                <span className="text-xs font-semibold uppercase tracking-wider text-pastel-powder font-mono">Envelope #{selectedLetter.id.toUpperCase()}</span>
+                <h3 className="font-serif text-xl font-bold text-pastel-navy my-2 border-b border-pastel-powder/30 pb-2">{selectedLetter.title}</h3>
+                <div className="bg-pastel-blue/20 p-5 rounded-2xl border border-pastel-powder/30 text-sm text-pastel-navy/80 leading-relaxed font-sans">
+                  {selectedLetter.content}
+                </div>
+                <div className="mt-6 text-right">
+                  <button onClick={() => setSelectedLetter(null)} className="bg-pastel-powder hover:bg-pastel-baby text-pastel-navy text-xs font-bold px-6 py-2.5 rounded-full shadow-sm">
+                    Close Letter
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+        </section>
+      );
+    }
+
+    // MAIN APP
     function App() {
       return (
         <div className="min-h-screen flex flex-col font-sans">
           <Navbar />
           <main className="flex-1">
-            <section id="home" className="min-h-[80vh] flex flex-col items-center justify-center text-center px-4 py-12 relative overflow-hidden">
-              <div className="absolute top-12 left-10 text-pastel-powder opacity-80"><FlowerSticker /></div>
-              <div className="absolute bottom-16 left-16 text-pastel-baby opacity-80"><RibbonSticker /></div>
-              <div className="absolute top-16 right-12 text-pastel-yellow opacity-90"><SparkleSticker /></div>
-
-              <span className="bg-pastel-blue/80 text-pastel-navy px-4 py-1.5 rounded-full border border-pastel-powder/50 text-xs font-bold mb-3 shadow-sm">
-                Hi, Kalan! ✨
-              </span>
-              <h1 className="font-serif text-4xl md:text-6xl font-bold text-pastel-navy tracking-tight leading-tight">
-                A Little World Made Just For You
-              </h1>
-              <p className="text-sm md:text-base text-pastel-navy/70 max-w-lg mx-auto mt-3 font-sans">
-                A digital memory scrapbook celebrating your birthday and graduation journey.
-              </p>
-
-              <div className="max-w-xs mx-auto my-8 p-3 bg-white rounded-3xl shadow-polaroid border-2 border-pastel-powder/40 rotate-1 hover:rotate-0 transition-transform duration-300 relative">
-                <div className="washi-tape-blue absolute -top-3 left-1/2 -translate-x-1/2 w-24 h-6 rounded-sm"></div>
-                <ImageWithFallback src={images.homepage} alt="Kalan Main" className="w-full h-auto rounded-2xl object-cover" />
-              </div>
-
-              <a href="#birthday" className="bg-pastel-powder hover:bg-pastel-baby text-pastel-navy font-bold text-sm px-8 py-3.5 rounded-full shadow-md transition-all duration-300 hover:scale-105 border border-white">
-                Explore Your Surprise ✨
-              </a>
-            </section>
-
+            {/* Header Profile Paling Atas */}
             <ProfileHeader />
+            <HeroSection />
             <BirthdayGiftSection />
             <GraduationFlipbookSection />
             <MediaSection />
             <OpenWhenLettersSection />
           </main>
 
+          {/* FOOTER */}
           <footer className="mt-20 py-10 bg-white/90 border-t-2 border-pastel-powder/30 text-center relative">
             <div className="max-w-md mx-auto px-4 flex flex-col items-center gap-2.5">
               <div className="w-12 h-12 rounded-2xl overflow-hidden border-2 border-pastel-powder shadow-sm">

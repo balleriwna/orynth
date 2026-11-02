@@ -254,7 +254,7 @@
       );
     }
 
-    // 1. PROFILE HEADER DI PALING ATAS (SEBAGAI HEADER UTAMA WEBSITE)
+    // 1. PROFILE HEADER DI PALING ATAS (DISPLAY NAME: KALAN, USERNAME: @rigelsta)
     function ProfileHeader() {
       return (
         <div id="profile" className="max-w-4xl mx-auto px-4 mt-6 mb-12">
@@ -283,7 +283,7 @@
                 <h2 className="text-2xl md:text-3xl font-bold font-serif text-pastel-navy flex items-center gap-2">
                   Kalan <span className="text-pastel-powder">✔</span>
                 </h2>
-                <p className="text-xs text-pastel-navy/60 font-mono">@kalan</p>
+                <p className="text-xs text-pastel-navy/60 font-mono">@rigelsta</p>
 
                 <p className="text-sm text-pastel-navy/80 mt-3 leading-relaxed font-sans max-w-2xl">
                   Living life one sweet memory at a time 🌿✨ Celebrating milestones, hard work, and good vibes. Welcome to my personal digital memory book!
@@ -349,7 +349,7 @@
       const [step, setStep] = useState('box');
 
       const handleOpenGift = () => {
-        triggerBalloons(); // Panggil balon terbang pas buka gift
+        triggerBalloons();
         if (window.confetti) {
           window.confetti({
             particleCount: 180,
@@ -554,7 +554,7 @@ Makasih banyak ya udah mau temenan sama gue. Makasih udah dengerin cerita-cerita
       };
 
       const handleVideoPlay = () => {
-        triggerBalloons(); // Balon terbang saat video diputar!
+        triggerBalloons();
       };
 
       return (
@@ -598,7 +598,7 @@ Makasih banyak ya udah mau temenan sama gue. Makasih udah dengerin cerita-cerita
             </div>
           </div>
 
-          {/* GALERI VIDEO (MURNI VIDEO + INTERAKSI BALON TERBANG) */}
+          {/* GALERI VIDEO */}
           <div className="grid md:grid-cols-2 gap-6">
             {videoList.map((video) => (
               <div key={video.id} className="bg-white/95 p-3 rounded-3xl border-2 border-pastel-powder/40 shadow-soft overflow-hidden group">
@@ -624,7 +624,7 @@ Makasih banyak ya udah mau temenan sama gue. Makasih udah dengerin cerita-cerita
 
       const openEnvelope = (letter) => {
         setSelectedLetter(letter);
-        triggerBalloons(); // Efek balon terbang saat amplop dibuka
+        triggerBalloons();
       };
 
       return (

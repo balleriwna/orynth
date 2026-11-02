@@ -52,11 +52,10 @@
   <!-- Canvas Confetti CDN -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.4/dist/confetti.browser.min.js"></script>
 
-  <!-- PageFlip CDN (Flipbook Animation) -->
+  <!-- PageFlip CDN -->
   <script src="https://cdn.jsdelivr.net/npm/page-flip@2.0.7/dist/js/page-flip.browser.js"></script>
 
   <style>
-    /* GRAPH PAPER BACKGROUND (Referensi 3: Nectar Design) */
     body {
       background-color: #FAF9F5;
       background-image: 
@@ -65,27 +64,11 @@
       background-size: 24px 24px;
     }
 
-    /* Custom Scrollbar */
     ::-webkit-scrollbar { width: 8px; }
     ::-webkit-scrollbar-track { background: #FAF9F5; }
     ::-webkit-scrollbar-thumb { background: #BAE0F5; border-radius: 9999px; }
     ::-webkit-scrollbar-thumb:hover { background: #90C8EF; }
 
-    /* SCALLOPED EDGES (Gerigi Kertas Aesthetic Referensi 1 & 3) */
-    .scallop-top {
-      background: radial-gradient(circle at 10px -5px, transparent 12px, #ffffff 13px);
-      background-size: 20px 20px;
-      height: 12px;
-      width: 100%;
-    }
-    .scallop-bottom {
-      background: radial-gradient(circle at 10px 15px, transparent 12px, #ffffff 13px);
-      background-size: 20px 20px;
-      height: 12px;
-      width: 100%;
-    }
-
-    /* WASHI TAPE STICKERS */
     .washi-tape-blue {
       background: rgba(186, 224, 245, 0.85);
       border-left: 3px dashed rgba(144, 200, 239, 0.6);
@@ -99,7 +82,6 @@
       box-shadow: 0 2px 6px rgba(0,0,0,0.05);
     }
 
-    /* FLIPBOOK CONTAINER UPGRADE */
     .stpageflip-container {
       box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.22);
       border-radius: 16px;
@@ -125,7 +107,6 @@
       z-index: 10;
     }
 
-    /* VINYL SPIN ANIMATION FOR MUSIC PLAYER */
     @keyframes spinSlow {
       from { transform: rotate(0deg); }
       to { transform: rotate(360deg); }
@@ -134,7 +115,6 @@
       animation: spinSlow 12s linear infinite;
     }
 
-    /* FLOATING STICKERS ANIMATION */
     @keyframes floatSticker {
       0%, 100% { transform: translateY(0px) rotate(0deg); }
       50% { transform: translateY(-10px) rotate(4deg); }
@@ -151,29 +131,29 @@
   <script type="text/babel">
     const { useState, useRef, useEffect } = React;
 
-    // PATH ASSETS (PURE NAMA FILE TANPA STRIP - PERSIS PERMINTAAN)
+    // PATH DAN EKSTENSI PERBAIKAN (.jpeg DAN TANPA PUBLIC/)
     const images = {
-      profile: "public/assets/images/profilekalan.jpg",
-      header: "public/assets/images/headerbanner.jpg",
-      homepage: "public/assets/images/homepagephoto.jpg",
-      birthdayCake: "public/assets/images/birthdaycake.jpg",
-      flipbookOpening: "public/assets/images/flipbookopening.jpg",
-      graduation: "public/assets/images/graduationphoto.jpg",
-      friendship: "public/assets/images/friendshipphoto.jpg",
-      flipbookClosing: "public/assets/images/flipbookclosing.jpg",
-      footer: "public/assets/images/footercarmen.jpg",
-      extra: "public/assets/images/extraphoto01.jpg"
+      profile: "assets/images/profilekalan.jpeg",
+      header: "assets/images/headerbanner.jpeg",
+      homepage: "assets/images/homepagephoto.jpeg",
+      birthdayCake: "assets/images/birthdaycake.jpeg",
+      flipbookOpening: "assets/images/flipbookopening.jpeg",
+      graduation: "assets/images/graduationphoto.jpeg",
+      friendship: "assets/images/friendshipphoto.jpeg",
+      flipbookClosing: "assets/images/flipbookclosing.jpeg",
+      footer: "assets/images/footercarmen.jpeg",
+      extra: "assets/images/extraphoto01.jpeg"
     };
 
     const musicList = [
-      { id: 1, title: "Favorite Song 1", artist: "Track #01", src: "public/assets/music/song1.mp3", cover: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=300" },
-      { id: 2, title: "Favorite Song 2", artist: "Track #02", src: "public/assets/music/song2.mp3", cover: "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=300" },
-      { id: 3, title: "Favorite Song 3", artist: "Track #03", src: "public/assets/music/song3.mp3", cover: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=300" }
+      { id: 1, title: "Favorite Song 1", artist: "Track #01", src: "assets/music/song1.mp3", cover: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=300" },
+      { id: 2, title: "Favorite Song 2", artist: "Track #02", src: "assets/music/song2.mp3", cover: "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=300" },
+      { id: 3, title: "Favorite Song 3", artist: "Track #03", src: "assets/music/song3.mp3", cover: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=300" }
     ];
 
     const videoList = [
-      { id: 1, src: "public/assets/videos/video1.mp4", thumbnail: "https://images.unsplash.com/photo-1518173946687-a4c8a383392e?w=600" },
-      { id: 2, src: "public/assets/videos/video2.mp4", thumbnail: "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=600" }
+      { id: 1, src: "assets/videos/video1.mp4", thumbnail: "https://images.unsplash.com/photo-1518173946687-a4c8a383392e?w=600" },
+      { id: 2, src: "assets/videos/video2.mp4", thumbnail: "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=600" }
     ];
 
     const lettersData = [
@@ -189,7 +169,6 @@
       { id: "j", title: "Open when you need a gentle reminder", content: "You matter, your feelings are completely valid, and you are doing so much better than you give yourself credit for. Be extra soft and kind to yourself today, because you are trying your best every single day, and that alone is something to be proud of." }
     ];
 
-    // SVG DEKORASI STIKER (REFERENSI 1 & 3)
     const FlowerSticker = () => (
       <svg className="w-8 h-8 text-pastel-powder animate-float-1" viewBox="0 0 24 24" fill="currentColor">
         <path d="M12 3a3 3 0 00-3 3 3 3 0 00-3-3 3 3 0 00-3 3 3 3 0 003 3 3 3 0 00-3 3 3 3 0 003 3 3 3 0 003-3 3 3 0 003 3 3 3 0 003-3 3 3 0 00-3-3 3 3 0 003-3 3 3 0 00-3-3z"/>
@@ -208,7 +187,6 @@
       </svg>
     );
 
-    // KOMPONEN FOTO DENAN PLACEHOLDER AESTHETIC
     function ImageWithFallback({ src, alt, className = "" }) {
       const [error, setError] = useState(false);
       if (error || !src) {
@@ -225,7 +203,6 @@
       return <img src={src} alt={alt} onError={() => setError(true)} className={`object-contain max-w-full h-auto ${className}`} loading="lazy" />;
     }
 
-    // NAVBAR WITH SCRAPBOOK BADGE
     function Navbar() {
       const [isOpen, setIsOpen] = useState(false);
       const navItems = [
@@ -267,12 +244,10 @@
       );
     }
 
-    // PROFILE HEADER (TWITTER/X DASHBOARD STYLE - GENDER NEUTRAL)
     function ProfileHeader() {
       return (
         <div id="memories" className="max-w-4xl mx-auto px-4 my-14">
           <div className="bg-white/95 rounded-3xl overflow-hidden shadow-soft border-2 border-pastel-powder/40 relative">
-            {/* Banner */}
             <div className="h-44 md:h-56 w-full bg-pastel-blue relative overflow-hidden">
               <ImageWithFallback src={images.header} alt="Header Banner" className="w-full h-full object-cover" />
               <div className="absolute top-4 right-4 bg-white/80 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-mono font-bold text-pastel-navy border border-pastel-powder/40 shadow-sm">
@@ -280,14 +255,12 @@
               </div>
             </div>
 
-            {/* Profile Content */}
             <div className="px-6 pb-6 relative">
               <div className="flex justify-between items-end -mt-16 md:-mt-20 mb-4">
                 <div className="w-28 h-28 md:w-36 md:h-36 rounded-full border-4 border-white overflow-hidden shadow-polaroid bg-pastel-blue relative z-10">
                   <ImageWithFallback src={images.profile} alt="Kalan Profile" className="w-full h-full object-cover" />
                 </div>
                 
-                {/* GENDER NEUTRAL BADGES (NO BOY/GIRL) */}
                 <div className="flex items-center gap-2">
                   <span className="bg-pastel-blue text-pastel-navy text-xs font-bold px-4 py-2 rounded-full border border-pastel-powder/50 shadow-sm">
                     ✨ Birthday & Graduation 🎓
@@ -305,7 +278,6 @@
                   Living life one sweet memory at a time 🌿✨ Celebrating milestones, hard work, and good vibes.
                 </p>
 
-                {/* Dashboard Stats Bar (Referensi 4) */}
                 <div className="grid grid-cols-3 gap-3 mt-6 pt-4 border-t border-pastel-powder/30 text-center">
                   <div className="bg-pastel-blue/30 p-2.5 rounded-2xl border border-pastel-powder/30">
                     <span className="block text-xs font-mono text-pastel-navy/60">CHAPTER</span>
@@ -327,7 +299,6 @@
       );
     }
 
-    // BIRTHDAY GIFT SURPRISE (EXACT TEXT)
     function BirthdayGiftSection() {
       const [step, setStep] = useState('box');
 
@@ -407,7 +378,6 @@ You deserve every single sweet thing this world has to offer, Kalan. Take time t
       );
     }
 
-    // GRADUATION FLIPBOOK (UPGRADED VISUAL SCRAPBOOK)
     function GraduationFlipbookSection() {
       const bookContainerRef = useRef(null);
       const pageFlipRef = useRef(null);
@@ -447,7 +417,6 @@ You deserve every single sweet thing this world has to offer, Kalan. Take time t
           <div className="flex justify-center items-center my-6">
             <div ref={bookContainerRef} className="stpageflip-container">
               
-              {/* PAGE 1: COVER */}
               <div className="page-sheet flex flex-col items-center justify-center text-center space-y-4">
                 <div className="washi-tape-blue absolute top-3 left-1/2 -translate-x-1/2 w-28 h-6 rounded-sm"></div>
                 <div className="w-full h-64 rounded-2xl overflow-hidden bg-pastel-blue/30 p-2 border border-pastel-powder/30">
@@ -457,7 +426,6 @@ You deserve every single sweet thing this world has to offer, Kalan. Take time t
                 <span className="text-[10px] bg-pastel-blue text-pastel-navy px-3 py-1 rounded-full font-mono">← Drag or Swipe to Flip →</span>
               </div>
 
-              {/* PAGE 2: GRADUATION PHOTO */}
               <div className="page-sheet flex flex-col items-center justify-center">
                 <div className="washi-tape-yellow absolute top-4 left-6 w-20 h-5 rounded-sm -rotate-6"></div>
                 <div className="w-full h-full rounded-2xl overflow-hidden bg-pastel-blue/20 p-2 border border-pastel-powder/30 flex items-center justify-center">
@@ -465,7 +433,6 @@ You deserve every single sweet thing this world has to offer, Kalan. Take time t
                 </div>
               </div>
 
-              {/* PAGE 3: GRADUATION MESSAGE */}
               <div className="page-sheet text-left space-y-3">
                 <h4 className="font-serif text-base font-bold text-pastel-navy border-b border-pastel-powder/30 pb-2 flex items-center justify-between">
                   <span>Graduation Message</span> 🎓
@@ -481,7 +448,6 @@ Honestly, watching your journey from afar over these past two years has been suc
                 </p>
               </div>
 
-              {/* PAGE 4: FRIENDSHIP PHOTO */}
               <div className="page-sheet flex flex-col items-center justify-center">
                 <div className="washi-tape-blue absolute top-4 right-6 w-20 h-5 rounded-sm rotate-6"></div>
                 <div className="w-full h-full rounded-2xl overflow-hidden bg-pastel-blue/20 p-2 border border-pastel-powder/30 flex items-center justify-center">
@@ -489,7 +455,6 @@ Honestly, watching your journey from afar over these past two years has been suc
                 </div>
               </div>
 
-              {/* PAGE 5: FRIENDSHIP MESSAGE */}
               <div className="page-sheet text-left space-y-3">
                 <h4 className="font-serif text-base font-bold text-pastel-navy border-b border-pastel-powder/30 pb-2 flex items-center justify-between">
                   <span>A Note on Friendship</span> 🩵
@@ -503,7 +468,6 @@ Makasih banyak ya udah mau temenan sama gue. Makasih udah dengerin cerita-cerita
                 </p>
               </div>
 
-              {/* PAGE 6: CLOSING */}
               <div className="page-sheet flex flex-col items-center justify-center text-center space-y-4">
                 <div className="w-full h-56 rounded-2xl overflow-hidden bg-pastel-blue/30 p-2 border border-pastel-powder/30">
                   <ImageWithFallback src={images.flipbookClosing} alt="Closing" className="w-full h-full object-contain" />
@@ -527,7 +491,6 @@ Makasih banyak ya udah mau temenan sama gue. Makasih udah dengerin cerita-cerita
       );
     }
 
-    // OPEN WHEN LETTERS (10 SURAT IMPOR SERBA AESTHETIC)
     function OpenWhenLettersSection() {
       const [selectedLetter, setSelectedLetter] = useState(null);
 
@@ -575,7 +538,6 @@ Makasih banyak ya udah mau temenan sama gue. Makasih udah dengerin cerita-cerita
       );
     }
 
-    // MEDIA SECTION (3 MUSIK + 2 VIDEO MURNI TANPA JUDUL)
     function MediaSection() {
       const [currentSong, setCurrentSong] = useState(musicList[0]);
       const [isPlaying, setIsPlaying] = useState(false);
@@ -598,12 +560,10 @@ Makasih banyak ya udah mau temenan sama gue. Makasih udah dengerin cerita-cerita
             <h2 className="font-serif text-3xl md:text-4xl font-bold text-pastel-navy mt-2">Music & Videos</h2>
           </div>
 
-          {/* Pemutar Musik */}
           <div className="bg-white/90 p-6 rounded-3xl border-2 border-pastel-powder/40 shadow-soft max-w-xl mx-auto mb-12 relative overflow-hidden">
             <div className="washi-tape-blue absolute -top-3 left-1/2 -translate-x-1/2 w-28 h-6 rounded-sm"></div>
             <audio ref={audioRef} src={currentSong.src} onEnded={() => setIsPlaying(false)} />
             <div className="flex flex-col sm:flex-row items-center gap-5 mt-2">
-              {/* Vinyl cover effect */}
               <div className="relative">
                 <img src={currentSong.cover} className={`w-24 h-24 rounded-full object-cover shadow-md border-2 border-white ${isPlaying ? 'animate-spin-slow' : ''}`} />
                 <div className="w-6 h-6 bg-white rounded-full absolute inset-0 m-auto border-2 border-pastel-powder"></div>
@@ -633,7 +593,6 @@ Makasih banyak ya udah mau temenan sama gue. Makasih udah dengerin cerita-cerita
             </div>
           </div>
 
-          {/* GALERI VIDEO (MURNI VIDEO - TANPA JUDUL ATAU DESKRIPSI TEKS DI BAWAHNYA) */}
           <div className="grid md:grid-cols-2 gap-6">
             {videoList.map((video) => (
               <div key={video.id} className="bg-white/95 p-3 rounded-3xl border-2 border-pastel-powder/40 shadow-soft overflow-hidden">
@@ -647,13 +606,11 @@ Makasih banyak ya udah mau temenan sama gue. Makasih udah dengerin cerita-cerita
       );
     }
 
-    // MAIN APP
     function App() {
       return (
         <div className="min-h-screen flex flex-col font-sans">
           <Navbar />
           <main className="flex-1">
-            {/* HERO SECTION */}
             <section id="home" className="min-h-[80vh] flex flex-col items-center justify-center text-center px-4 py-12 relative overflow-hidden">
               <div className="absolute top-12 left-10 text-pastel-powder opacity-80"><FlowerSticker /></div>
               <div className="absolute bottom-16 left-16 text-pastel-baby opacity-80"><RibbonSticker /></div>
@@ -669,7 +626,6 @@ Makasih banyak ya udah mau temenan sama gue. Makasih udah dengerin cerita-cerita
                 A digital memory scrapbook celebrating your birthday and graduation journey.
               </p>
 
-              {/* Main Polaroid Frame */}
               <div className="max-w-xs mx-auto my-8 p-3 bg-white rounded-3xl shadow-polaroid border-2 border-pastel-powder/40 rotate-1 hover:rotate-0 transition-transform duration-300 relative">
                 <div className="washi-tape-blue absolute -top-3 left-1/2 -translate-x-1/2 w-24 h-6 rounded-sm"></div>
                 <ImageWithFallback src={images.homepage} alt="Kalan Main" className="w-full h-auto rounded-2xl object-cover" />
@@ -687,7 +643,6 @@ Makasih banyak ya udah mau temenan sama gue. Makasih udah dengerin cerita-cerita
             <OpenWhenLettersSection />
           </main>
 
-          {/* FOOTER */}
           <footer className="mt-20 py-10 bg-white/90 border-t-2 border-pastel-powder/30 text-center relative">
             <div className="max-w-md mx-auto px-4 flex flex-col items-center gap-2.5">
               <div className="w-12 h-12 rounded-2xl overflow-hidden border-2 border-pastel-powder shadow-sm">

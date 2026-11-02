@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>A Little World Made Just For You | Kalan</title>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            pastel: {
+              blue: '#E2EEF9',
+              baby: '#BAE0F5',
+              powder: '#90C8EF',
+              offwhite: '#FAF9F5',
+              grey: '#E2E8F0',
+              navy: '#0F172A',
+              deepnavy: '#1E293B'
+            }
+          },
+          fontFamily: {
+            serif: ['Playfair Display', 'Georgia', 'serif'],
+            sans: ['Plus Jakarta Sans', 'sans-serif'],
+          },
+          boxShadow: {
+            soft: '0 10px 25px -5px rgba(144, 200, 239, 0.25), 0 8px 10px -6px rgba(15, 23, 42, 0.05)'
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- React & Babel CDN -->
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <!-- Canvas Confetti CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.4/dist/confetti.browser.min.js"></script>
+
+  <!-- PageFlip CDN (Flipbook Animation) -->
+  <script src="https://cdn.jsdelivr.net/npm/page-flip@2.0.7/dist/js/page-flip.browser.js"></script>
+
+  <style>
+    body {
+      background-color: #FAF9F5;
+      background-image: 
+        radial-gradient(#BAE0F5 0.75px, transparent 0.75px), 
+        radial-gradient(#BAE0F5 0.75px, #FAF9F5 0.75px);
+      background-size: 30px 30px;
+      background-position: 0 0, 15px 15px;
+    }
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: #FAF9F5; }
+    ::-webkit-scrollbar-thumb { background: #BAE0F5; border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb:hover { background: #90C8EF; }
+    
+    .stpageflip-container {
+      box-shadow: 0 15px 30px rgba(15, 23, 42, 0.1);
+      border-radius: 12px;
+      overflow: hidden;
+      margin: 0 auto;
+    }
+    .page-sheet {
+      background-color: #ffffff;
+      border: 1px solid #E2EEF9;
+      padding: 24px;
+      overflow-y: auto;
+    }
+  </style>
+</head>
+<body class="bg-pastel-offwhite text-pastel-navy font-sans antialiased overflow-x-hidden">
+
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useRef, useEffect } = React;
+
+    // KONFIGURASI NAMA FILE (TANPA KARAKTER STRIP)
+    const images = {
+      profile: "public/assets/images/profilekalan.jpg",
+      header: "public/assets/images/headerbanner.jpg",
+      homepage: "public/assets/images/homepagephoto.jpg",
+      birthdayCake: "public/assets/images/birthdaycake.jpg",
+      flipbookOpening: "public/assets/images/flipbookopening.jpg",
+      graduation: "public/assets/images/graduationphoto.jpg",
+      friendship: "public/assets/images/friendshipphoto.jpg",
+      flipbookClosing: "public/assets/images/flipbookclosing.jpg",
+      footer: "public/assets/images/footercarmen.jpg",
+      extra: "public/assets/images/extraphoto01.jpg"
+    };
+
+    const musicList = [
+      { id: 1, title: "Favorite Song 1", artist: "Artist 1", src: "public/assets/music/song1.mp3", cover: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=300" },
+      { id: 2, title: "Favorite Song 2", artist: "Artist 2", src: "public/assets/music/song2.mp3", cover: "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=300" },
+      { id: 3, title: "Favorite Song 3", artist: "Artist 3", src: "public/assets/music/song3.mp3", cover: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=300" }
+    ];
+
+    const videoList = [
+      { id: 1, title: "Special Moment 1", description: "Precious memory in motion.", src: "public/assets/videos/video1.mp4", thumbnail: "https://images.unsplash.com/photo-1518173946687-a4c8a383392e?w=600" },
+      { id: 2, title: "Graduation Highlight", description: "Celebrating your hard work!", src: "public/assets/videos/video2.mp4", thumbnail: "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=600" }
+    ];
+
+    const lettersData = [
+      { id: "a", title: "Open when you feel sad", content: "It is completely okay to feel down sometimes, Kalan. You do not always have to be strong or hold everything together. Give yourself permission to pause, rest, take a deep breath, and let your heart feel whatever it needs to. Remember that heavy days do not last forever, and this dark cloud will pass. You are loved, valued, and deeply cared for, even when things feel heavy." },
+      { id: "b", title: "Open when you feel happy", content: "Yay! I hope you are taking a moment to really soak in this beautiful feeling today. You deserve every tiny bit of joy, laughter, and light coming your way. Hold onto this moment, smile bright, and remember how good life can feel. Keep this happiness stored in your heart for the quieter days ahead!" },
+      { id: "c", title: "Open when you feel worried", content: "Take a slow, deep breath right now and let your shoulders relax. Whatever is making your mind race, remember that you do not have to solve everything in this single moment. You have handled tough situations before, and you will handle this one too. Take it one tiny step at a time, and trust that things will work out in the end." },
+      { id: "d", title: "Open when you are overthinking", content: "Hey, turn off your brain for a little bit! Our minds like to create scenarios that are far worse than reality. Thoughts are not always facts, so try not to believe everything your stressed mind is telling you right now. Step away from your screen, drink a cold glass of water, step outside, and let your mind settle down naturally." },
+      { id: "e", title: "Open when you feel lonely", content: "Just a gentle reminder that even with the physical distance between us, you are never truly alone. Distance does not change the fact that someone out here genuinely appreciates you, thinks of you, and wishes the absolute best for you. I am always right here in your corner sending you warm thoughts whenever you need them." },
+      { id: "f", title: "Open when you are about to start a busy day", content: "You have got this! Before you jump into the chaos of the day, take a quiet moment for yourself. Do not rush through things, take it one task at a time, and remember to pause for breaks along the way. Stay hydrated, stay calm, and know that you are more than capable of handling whatever today throws at you." },
+      { id: "g", title: "Open when you feel like giving up", content: "Look back at how far you have already come and how many hard days you have already survived. You have made it through 100% of your worst days so far, which means your track record is undefeated. If you are tired, learn to rest, not to quit. Take a pause, recharge your energy, and remember that I believe in you so much." },
+      { id: "h", title: "Open when you feel insecure", content: "Please stop being so hard on yourself. You have such a rare, kind soul, a gentle heart, and a character that makes the world a much softer place. You do not need to prove your worth to anyone because you are already more than enough just as you are. Never forget how special you truly are." },
+      { id: "i", title: "Open when you had a bad day", content: "I'm so sorry today was tough on you. Please remember that one bad day doesn't mean your whole life is bad, and it definitely doesn't erase all the good progress you've made. Get some good rest, eat something comforting, and treat yourself gently tonight. You did your best today, and that is more than enough." },
+      { id: "j", title: "Open when you need a gentle reminder", content: "You matter, your feelings are completely valid, and you are doing so much better than you give yourself credit for. Be extra soft and kind to yourself today, because you are trying your best every single day, and that alone is something to be proud of." }
+    ];
+
+    // KOMPONEN FOTO DENAN PLACEHOLDER
+    function ImageWithFallback({ src, alt, className = "" }) {
+      const [error, setError] = useState(false);
+      if (error || !src) {
+        return (
+          <div className={`bg-pastel-blue/40 border-2 border-dashed border-pastel-powder rounded-2xl flex flex-col items-center justify-center p-6 text-center text-pastel-navy/70 ${className}`}>
+            <span className="text-xs font-semibold uppercase tracking-wider">Foto Belum Ada</span>
+            <span className="text-[10px] font-mono mt-1 text-pastel-navy/60 bg-white/60 px-2 py-0.5 rounded border border-pastel-powder/30">
+              {src ? src.split('/').pop() : 'assets/images/...'}
+            </span>
+          </div>
+        );
+      }
+      return <img src={src} alt={alt} onError={() => setError(true)} className={`object-contain max-w-full h-auto ${className}`} loading="lazy" />;
+    }
+
+    // NAVBAR
+    function Navbar() {
+      const [isOpen, setIsOpen] = useState(false);
+      const navItems = [
+        { name: 'Home', href: '#home' },
+        { name: 'Birthday Gift', href: '#birthday' },
+        { name: 'Memories', href: '#memories' },
+        { name: 'Graduation', href: '#graduation' },
+        { name: 'Music & Videos', href: '#media' },
+        { name: 'Open When Letters', href: '#letters' },
+      ];
+
+      return (
+        <header className="sticky top-4 z-50 max-w-6xl mx-auto px-4">
+          <nav className="bg-white/80 backdrop-blur-md rounded-full px-6 py-3 shadow-soft border border-pastel-powder/30 flex items-center justify-between">
+            <a href="#home" className="font-serif text-lg font-bold text-pastel-navy">Kalan's World ✨</a>
+            <div className="hidden md:flex items-center gap-6">
+              {navItems.map((item) => (
+                <a key={item.name} href={item.href} className="text-xs font-semibold text-pastel-navy/80 hover:text-pastel-powder transition-colors">
+                  {item.name}
+                </a>
+              ))}
+            </div>
+            <button onClick={() => setIsOpen(!isOpen)} className="md:hidden text-pastel-navy p-1">
+              {isOpen ? '✕' : '☰'}
+            </button>
+          </nav>
+          {isOpen && (
+            <div className="md:hidden mt-2 bg-white/95 rounded-2xl p-4 border border-pastel-powder/30 shadow-lg flex flex-col gap-3 text-center">
+              {navItems.map((item) => (
+                <a key={item.name} href={item.href} onClick={() => setIsOpen(false)} className="text-sm font-medium text-pastel-navy py-1">
+                  {item.name}
+                </a>
+              ))}
+            </div>
+          )}
+        </header>
+      );
+    }
+
+    // PROFILE HEADER (ALA TWITTER/X)
+    function ProfileHeader() {
+      return (
+        <div id="memories" className="max-w-4xl mx-auto px-4 my-12">
+          <div className="bg-white/90 rounded-3xl overflow-hidden shadow-soft border-2 border-pastel-powder/40">
+            <div className="h-44 md:h-56 w-full bg-pastel-blue relative overflow-hidden">
+              <ImageWithFallback src={images.header} alt="Header Banner" className="w-full h-full object-cover" />
+            </div>
+            <div className="px-6 pb-6 relative">
+              <div className="flex justify-between items-end -mt-16 md:-mt-20 mb-4">
+                <div className="w-28 h-28 md:w-36 md:h-36 rounded-full border-4 border-white overflow-hidden shadow-md bg-pastel-blue">
+                  <ImageWithFallback src={images.profile} alt="Kalan Profile" className="w-full h-full object-cover" />
+                </div>
+                <span className="bg-pastel-blue text-pastel-navy text-xs font-bold px-4 py-2 rounded-full border border-pastel-powder/50">
+                  ✨ Birthday & Grad Boy
+                </span>
+              </div>
+              <h2 className="text-2xl font-bold font-serif text-pastel-navy">Kalan</h2>
+              <p className="text-xs text-pastel-navy/60 font-mono">@kalan</p>
+              <p className="text-sm text-pastel-navy/80 mt-3 leading-relaxed">
+                Living life one sweet memory at a time 🌿✨ Celebrating milestones, hard work, and good vibes.
+              </p>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // BIRTHDAY GIFT SURPRISE
+    function BirthdayGiftSection() {
+      const [step, setStep] = useState('box');
+
+      const handleOpenGift = () => {
+        if (window.confetti) {
+          window.confetti({
+            particleCount: 120,
+            spread: 80,
+            origin: { y: 0.6 },
+            colors: ['#BAE0F5', '#90C8EF', '#E2EEF9', '#FFFFFF']
+          });
+        }
+        setStep('cake');
+      };
+
+      return (
+        <section id="birthday" className="max-w-4xl mx-auto px-4 py-16 text-center">
+          {step === 'box' && (
+            <div className="bg-white/90 p-8 md:p-12 rounded-3xl border-2 border-pastel-powder/40 shadow-soft max-w-lg mx-auto flex flex-col items-center gap-6">
+              <div className="w-20 h-20 bg-pastel-blue/60 rounded-full flex items-center justify-center text-3xl">🎁</div>
+              <div>
+                <h3 className="font-serif text-2xl md:text-3xl font-bold text-pastel-navy">A Special Gift For You</h3>
+                <p className="text-xs md:text-sm text-pastel-navy/70 mt-2">Something special is waiting inside. Are you ready?</p>
+              </div>
+              <button onClick={handleOpenGift} className="bg-pastel-powder hover:bg-pastel-baby text-pastel-navy font-bold px-8 py-3.5 rounded-full shadow-md transition-transform hover:scale-105 border border-white text-sm">
+                Open Your Gift ✨
+              </button>
+            </div>
+          )}
+
+          {step === 'cake' && (
+            <div className="bg-white/90 p-8 md:p-12 rounded-3xl border-2 border-pastel-powder/40 shadow-soft max-w-xl mx-auto flex flex-col items-center gap-6">
+              <div className="max-w-xs w-full bg-pastel-blue/30 rounded-2xl p-4 border border-pastel-powder/30">
+                <ImageWithFallback src={images.birthdayCake} alt="Birthday Cake" className="w-full h-auto rounded-xl object-contain" />
+              </div>
+              <div>
+                <h3 className="font-serif text-3xl font-bold text-pastel-navy">Make a Wish!</h3>
+                <p className="text-xs md:text-sm text-pastel-navy/70 mt-2">Before reading your little surprise, here's a cake made for you.</p>
+              </div>
+              <button onClick={() => setStep('message')} className="bg-pastel-powder hover:bg-pastel-baby text-pastel-navy font-bold px-8 py-3.5 rounded-full shadow-md transition-transform hover:scale-105 border border-white text-sm">
+                Continue ➔
+              </button>
+            </div>
+          )}
+
+          {step === 'message' && (
+            <div className="bg-white/95 p-8 md:p-12 rounded-3xl border-2 border-pastel-powder/40 shadow-soft max-w-2xl mx-auto text-left space-y-6">
+              <h3 className="font-serif text-2xl font-bold text-pastel-navy border-b border-pastel-powder/30 pb-4">
+                Happy Birthday, Kalan! 🎉
+              </h3>
+              <div className="text-sm md:text-base text-pastel-navy/80 leading-relaxed space-y-4 font-sans whitespace-pre-line">
+                {`Happy birthday, Kalan! I wanted to take a moment to tell you how truly happy I am that you were born. The world is honestly a much brighter, softer, and kinder place simply because you exist in it. Having you as a friend over these past two years has been one of the sweetest blessings in my life, and I am so thankful that our paths crossed.
+
+Thank you so much for hanging in there and for surviving all the hard days that nobody else ever saw. I know life hasn't always been easy, and there were probably times when things felt overwhelmingly heavy, but you kept going anyway. I am so genuinely proud of the strong, resilient, and soft-hearted person you have continued to be through it all.
+
+As you step into this new chapter of your life, my biggest prayer for you is that life gives you back all the warmth and kindness you so freely share with others. May you find quiet peace on the hard days, genuine laughter on the ordinary days, and the courage to pursue every single dream that lives in your heart.
+
+I hope today brings you so much comfort and pure joy. You deserve to be surrounded by good food, your favorite music, and all the love in the world. Never doubt how much your presence means to the people around you, because you truly bring so much light just by being yourself.
+
+You deserve every single sweet thing this world has to offer, Kalan. Take time to celebrate yourself today and reflect on how far you have come. I am so glad to know you and to cheer you on. Happy birthday once again!`}
+              </div>
+            </div>
+          )}
+        </section>
+      );
+    }
+
+    // GRADUATION FLIPBOOK (DENGAN STPAGEFLIP MEMBALIK HALAMAN BUKU FISIK)
+    function GraduationFlipbookSection() {
+      const bookContainerRef = useRef(null);
+      const pageFlipRef = useRef(null);
+
+      useEffect(() => {
+        if (bookContainerRef.current && window.St && window.St.PageFlip) {
+          const isMobile = window.innerWidth < 768;
+          const pageFlip = new window.St.PageFlip(bookContainerRef.current, {
+            width: isMobile ? 320 : 380,
+            height: isMobile ? 460 : 520,
+            size: "fixed",
+            minWidth: 280,
+            maxWidth: 420,
+            minHeight: 400,
+            maxHeight: 580,
+            showCover: true,
+            mobileScrollSupport: true,
+            usePortrait: isMobile
+          });
+
+          pageFlip.loadFromHTML(document.querySelectorAll(".page-sheet"));
+          pageFlipRef.current = pageFlip;
+        }
+      }, []);
+
+      const flipPrev = () => pageFlipRef.current && pageFlipRef.current.flipPrev();
+      const flipNext = () => pageFlipRef.current && pageFlipRef.current.flipNext();
+
+      return (
+        <section id="graduation" className="max-w-5xl mx-auto px-4 py-16 text-center">
+          <div className="mb-8">
+            <span className="bg-pastel-blue/60 text-pastel-navy px-4 py-1.5 rounded-full border border-pastel-powder/40 text-xs font-semibold">📖 Graduation Flipbook</span>
+            <h2 className="font-serif text-3xl md:text-4xl font-bold text-pastel-navy mt-2">Graduation Memory Book</h2>
+            <p className="text-xs text-pastel-navy/60 mt-1">Buka dan geser lembaran buku untuk membaca pesan graduation!</p>
+          </div>
+
+          <div className="flex justify-center items-center my-6">
+            <div ref={bookContainerRef} className="stpageflip-container">
+              {/* PAGE 1: COVER */}
+              <div className="page-sheet flex flex-col items-center justify-center text-center space-y-4">
+                <div className="w-full h-64 rounded-2xl overflow-hidden bg-pastel-blue/30 p-2 border border-pastel-powder/20">
+                  <ImageWithFallback src={images.flipbookOpening} alt="Opening" className="w-full h-full object-contain" />
+                </div>
+                <h3 className="font-serif text-xl font-bold text-pastel-navy">A little celebration of your hard work.</h3>
+                <p className="text-xs text-pastel-navy/60 font-mono">← Swipe/Drag to Flip →</p>
+              </div>
+
+              {/* PAGE 2: GRADUATION PHOTO */}
+              <div className="page-sheet flex flex-col items-center justify-center">
+                <div className="w-full h-full rounded-2xl overflow-hidden bg-pastel-blue/20 p-2 border border-pastel-powder/20 flex items-center justify-center">
+                  <ImageWithFallback src={images.graduation} alt="Graduation Photo" className="w-full h-full object-contain" />
+                </div>
+              </div>
+
+              {/* PAGE 3: GRADUATION MESSAGE */}
+              <div className="page-sheet text-left space-y-3">
+                <h4 className="font-serif text-lg font-bold text-pastel-navy border-b border-pastel-powder/20 pb-2">Graduation Message 🎓</h4>
+                <p className="text-xs text-pastel-navy/80 leading-relaxed font-sans whitespace-pre-line">
+                  {`Happy graduation, Kalan! You finally did it! Seeing you reach this incredible milestone and officially earn your degree makes me so ridiculously proud of you. You put in the time, the focus, and the effort, and now you are standing on the other side of all that hard work with a degree that proves just how capable you are.
+
+I know how many exhausting nights, stressful deadlines, and quiet sacrifices went into making this day happen. All those moments where you felt tired, overwhelmed, or wondered if it would ever end were not in vain. You fought through every obstacle, and you earned every single bit of this success through your own grit and determination.
+
+As you step out into the world with your degree, I have absolutely no doubt that you are going to accomplish amazing things. Whatever path you choose next, whether it is continuing your studies, building your career, or pursuing new passions, I know you will approach it with the same brilliance and dedication you showed throughout college.
+
+Honestly, watching your journey from afar over these past two years has been such an honor and a privilege. Seeing all your hard work pay off and watching you cross the finish line with your degree in hand genuinely brings tears to my eyes and warms my heart beyond words. Never forget how much strength and potential you carry within yourself, Kalan. I will always be in your corner, cheering for you through every single victory to come.`}
+                </p>
+              </div>
+
+              {/* PAGE 4: FRIENDSHIP PHOTO */}
+              <div className="page-sheet flex flex-col items-center justify-center">
+                <div className="w-full h-full rounded-2xl overflow-hidden bg-pastel-blue/20 p-2 border border-pastel-powder/20 flex items-center justify-center">
+                  <ImageWithFallback src={images.friendship} alt="Friendship Photo" className="w-full h-full object-contain" />
+                </div>
+              </div>
+
+              {/* PAGE 5: FRIENDSHIP MESSAGE */}
+              <div className="page-sheet text-left space-y-3">
+                <h4 className="font-serif text-lg font-bold text-pastel-navy border-b border-pastel-powder/20 pb-2">A Note on Friendship 🩵</h4>
+                <p className="text-xs text-pastel-navy/80 leading-relaxed font-sans whitespace-pre-line">
+                  {`Halooooo Kalan, makasih ya udah mau jadi temen gue kurang lebih 2 tahun ini. Honest speaking, gue gatau apakah lu bakal mengingat gue seperti gue mengingat lu atau enggaa, tapi satu hal yang pasti, gue sangat amat bersyukur karena bisa kenalan dan berteman sama lu. (Beneran ga boong)
+
+Gue sadar kita mungkin ga bisa selamanya berteman atau ngobrol tiap hari. Tapi walaupun pertemanan kita ini tergolong low maintenance, sosok lu tuh beneran berkesan banget buat gue🥺✌🏻. Tipe pertemanan yang biarpun kita jarang main atau jarang kontek-kontekan, tempat lu di ingatan gue bakal tetep hangat dan bener-bener ga bisa gue lupain gitu ajaaa.
+
+Makasih banyak ya udah mau temenan sama gue. Makasih udah dengerin cerita-cerita gue, udah mau main bareng, dan udah ekstra sabar menghadapi gue selama ini... Intinya makasih banyak yaaa. Having you as a friend over these past two years has been such a sweet blessing for me. Thank you for always being a safe space, for existing, and for being such a memorable part of my life, Kalan!`}
+                </p>
+              </div>
+
+              {/* PAGE 6: CLOSING */}
+              <div className="page-sheet flex flex-col items-center justify-center text-center space-y-4">
+                <div className="w-full h-56 rounded-2xl overflow-hidden bg-pastel-blue/30 p-2 border border-pastel-powder/20">
+                  <ImageWithFallback src={images.flipbookClosing} alt="Closing" className="w-full h-full object-contain" />
+                </div>
+                <h3 className="font-serif text-xl font-bold text-pastel-navy">Once again, congratulations!</h3>
+                <p className="text-xs text-pastel-navy/70">Your journey is just beginning. Keep growing, keep dreaming, and keep being you.</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex justify-center gap-4 mt-4">
+            <button onClick={flipPrev} className="bg-white hover:bg-pastel-blue text-pastel-navy font-bold px-6 py-2 rounded-full border border-pastel-powder/40 shadow-sm text-xs">
+              ← Prev Page
+            </button>
+            <button onClick={flipNext} className="bg-white hover:bg-pastel-blue text-pastel-navy font-bold px-6 py-2 rounded-full border border-pastel-powder/40 shadow-sm text-xs">
+              Next Page →
+            </button>
+          </div>
+        </section>
+      );
+    }
+
+    // OPEN WHEN LETTERS (10 SURAT)
+    function OpenWhenLettersSection() {
+      const [selectedLetter, setSelectedLetter] = useState(null);
+
+      return (
+        <section id="letters" className="max-w-5xl mx-auto px-4 py-16 text-center">
+          <div className="mb-8">
+            <span className="bg-pastel-blue/60 text-pastel-navy px-4 py-1.5 rounded-full border border-pastel-powder/40 text-xs font-semibold">✉️ Open When Letters</span>
+            <h2 className="font-serif text-3xl md:text-4xl font-bold text-pastel-navy mt-2">10 Special Envelopes</h2>
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+            {lettersData.map((letter) => (
+              <button
+                key={letter.id}
+                onClick={() => setSelectedLetter(letter)}
+                className="bg-white hover:bg-pastel-blue/40 p-4 rounded-2xl border-2 border-pastel-powder/40 shadow-soft flex flex-col items-center gap-2 text-center transition-all duration-300 hover:-translate-y-1"
+              >
+                <div className="w-10 h-10 bg-pastel-blue rounded-full flex items-center justify-center text-lg">✉️</div>
+                <span className="font-serif text-xs font-bold text-pastel-navy line-clamp-2">{letter.title}</span>
+              </button>
+            ))}
+          </div>
+
+          {selectedLetter && (
+            <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4">
+              <div className="bg-white rounded-3xl p-6 md:p-8 max-w-lg w-full border-2 border-pastel-powder shadow-2xl text-left relative">
+                <button onClick={() => setSelectedLetter(null)} className="absolute top-4 right-4 text-gray-400 hover:text-black">✕</button>
+                <span className="text-xs font-semibold uppercase text-pastel-powder">Envelope #{selectedLetter.id.toUpperCase()}</span>
+                <h3 className="font-serif text-xl font-bold text-pastel-navy my-2 border-b border-pastel-powder/30 pb-2">{selectedLetter.title}</h3>
+                <div className="bg-pastel-blue/20 p-4 rounded-2xl border border-pastel-powder/30 text-sm text-pastel-navy/80 leading-relaxed font-sans">
+                  {selectedLetter.content}
+                </div>
+                <div className="mt-6 text-right">
+                  <button onClick={() => setSelectedLetter(null)} className="bg-pastel-powder hover:bg-pastel-baby text-pastel-navy text-xs font-bold px-6 py-2 rounded-full">
+                    Close Letter
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+        </section>
+      );
+    }
+
+    // MEDIA SECTION (3 MUSIK + 2 VIDEO)
+    function MediaSection() {
+      const [currentSong, setCurrentSong] = useState(musicList[0]);
+      const [isPlaying, setIsPlaying] = useState(false);
+      const audioRef = useRef(null);
+
+      const togglePlay = () => {
+        if (!audioRef.current) return;
+        if (isPlaying) {
+          audioRef.current.pause();
+        } else {
+          audioRef.current.play().catch(() => {});
+        }
+        setIsPlaying(!isPlaying);
+      };
+
+      return (
+        <section id="media" className="max-w-5xl mx-auto px-4 py-16">
+          <div className="text-center mb-10">
+            <span className="bg-pastel-blue/60 text-pastel-navy px-4 py-1.5 rounded-full border border-pastel-powder/40 text-xs font-semibold">🎵 Media Lounge</span>
+            <h2 className="font-serif text-3xl md:text-4xl font-bold text-pastel-navy mt-2">Music & Videos</h2>
+          </div>
+
+          {/* Pemutar Musik */}
+          <div className="bg-white/90 p-6 rounded-3xl border-2 border-pastel-powder/40 shadow-soft max-w-xl mx-auto mb-10">
+            <audio ref={audioRef} src={currentSong.src} onEnded={() => setIsPlaying(false)} />
+            <div className="flex flex-col sm:flex-row items-center gap-4">
+              <img src={currentSong.cover} className="w-20 h-20 rounded-2xl object-cover" />
+              <div className="flex-1 text-center sm:text-left">
+                <h4 className="font-serif text-base font-bold text-pastel-navy">{currentSong.title}</h4>
+                <p className="text-xs text-pastel-navy/60">{currentSong.artist}</p>
+                <div className="flex items-center justify-center sm:justify-start gap-3 mt-3">
+                  <button onClick={togglePlay} className="bg-pastel-powder hover:bg-pastel-baby px-5 py-1.5 rounded-full text-xs font-bold text-pastel-navy">
+                    {isPlaying ? 'Pause ⏸' : 'Play ▶'}
+                  </button>
+                  <select 
+                    onChange={(e) => {
+                      const song = musicList.find(s => s.id === parseInt(e.target.value));
+                      if (song) {
+                        setCurrentSong(song);
+                        setIsPlaying(false);
+                      }
+                    }}
+                    className="text-xs border border-pastel-powder/50 rounded-lg px-2 py-1 bg-white text-pastel-navy"
+                  >
+                    {musicList.map(s => <option key={s.id} value={s.id}>{s.title}</option>)}
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Galeri Video */}
+          <div className="grid md:grid-cols-2 gap-6">
+            {videoList.map((video) => (
+              <div key={video.id} className="bg-white/90 p-4 rounded-3xl border-2 border-pastel-powder/40 shadow-soft">
+                <div className="aspect-video rounded-2xl overflow-hidden bg-slate-900 mb-3">
+                  <video src={video.src} poster={video.thumbnail} controls className="w-full h-full object-contain" />
+                </div>
+                <h4 className="font-serif text-base font-bold text-pastel-navy">{video.title}</h4>
+                <p className="text-xs text-pastel-navy/70 mt-1">{video.description}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+      );
+    }
+
+    // MAIN APP
+    function App() {
+      return (
+        <div className="min-h-screen flex flex-col font-sans">
+          <Navbar />
+          <main className="flex-1">
+            <section id="home" className="min-h-[75vh] flex flex-col items-center justify-center text-center px-4 py-12">
+              <span className="bg-pastel-blue/60 text-pastel-navy px-4 py-1.5 rounded-full border border-pastel-powder/40 text-xs font-semibold mb-3">Hi, Kalan! ✨</span>
+              <h1 className="font-serif text-4xl md:text-6xl font-bold text-pastel-navy">A Little World Made Just For You</h1>
+              <p className="text-sm md:text-base text-pastel-navy/70 max-w-lg mx-auto mt-3">A digital memory scrapbook celebrating your birthday and graduation journey.</p>
+              <div className="max-w-xs mx-auto my-6 p-3 bg-white rounded-3xl shadow-soft border-2 border-pastel-powder/40">
+                <ImageWithFallback src={images.homepage} alt="Kalan Main" className="w-full h-auto rounded-2xl object-cover" />
+              </div>
+              <a href="#birthday" className="bg-pastel-powder hover:bg-pastel-baby text-pastel-navy font-bold text-sm px-8 py-3.5 rounded-full shadow-md">
+                Explore Your Surprise ✨
+              </a>
+            </section>
+
+            <ProfileHeader />
+            <BirthdayGiftSection />
+            <GraduationFlipbookSection />
+            <MediaSection />
+            <OpenWhenLettersSection />
+          </main>
+
+          <footer className="mt-20 py-10 bg-white/80 border-t border-pastel-powder/30 text-center">
+            <div className="max-w-md mx-auto px-4 flex flex-col items-center gap-2">
+              <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-pastel-powder">
+                <ImageWithFallback src={images.footer} alt="Carmen" className="w-full h-full object-cover" />
+              </div>
+              <p className="font-serif text-sm font-semibold text-pastel-navy">dari <span className="text-pastel-powder">@carmencakep</span></p>
+              <p className="text-xs text-pastel-navy/60">Made with 🩵 just for you.</p>
+            </div>
+          </footer>
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>

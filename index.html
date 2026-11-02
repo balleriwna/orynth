@@ -17,9 +17,12 @@
               baby: '#BAE0F5',
               powder: '#90C8EF',
               offwhite: '#FAF9F5',
-              grey: '#E2E8F0',
+              cream: '#FFFDF9',
+              grey: '#F1F5F9',
               navy: '#0F172A',
-              deepnavy: '#1E293B'
+              deepnavy: '#1E293B',
+              accent: '#7CB9E8',
+              yellow: '#F7E8AC'
             }
           },
           fontFamily: {
@@ -27,7 +30,9 @@
             sans: ['Plus Jakarta Sans', 'sans-serif'],
           },
           boxShadow: {
-            soft: '0 10px 25px -5px rgba(144, 200, 239, 0.25), 0 8px 10px -6px rgba(15, 23, 42, 0.05)'
+            soft: '0 12px 30px -5px rgba(144, 200, 239, 0.35), 0 8px 15px -6px rgba(15, 23, 42, 0.05)',
+            polaroid: '0 18px 40px -5px rgba(15, 23, 42, 0.15)',
+            scrapbook: '5px 5px 0px 0px #90C8EF'
           }
         }
       }
@@ -51,41 +56,102 @@
   <script src="https://cdn.jsdelivr.net/npm/page-flip@2.0.7/dist/js/page-flip.browser.js"></script>
 
   <style>
+    /* GRAPH PAPER BACKGROUND (Referensi 3: Nectar Design) */
     body {
       background-color: #FAF9F5;
       background-image: 
-        radial-gradient(#BAE0F5 0.75px, transparent 0.75px), 
-        radial-gradient(#BAE0F5 0.75px, #FAF9F5 0.75px);
-      background-size: 30px 30px;
-      background-position: 0 0, 15px 15px;
+        linear-gradient(to right, rgba(144, 200, 239, 0.18) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(144, 200, 239, 0.18) 1px, transparent 1px);
+      background-size: 24px 24px;
     }
+
+    /* Custom Scrollbar */
     ::-webkit-scrollbar { width: 8px; }
     ::-webkit-scrollbar-track { background: #FAF9F5; }
     ::-webkit-scrollbar-thumb { background: #BAE0F5; border-radius: 9999px; }
     ::-webkit-scrollbar-thumb:hover { background: #90C8EF; }
-    
+
+    /* SCALLOPED EDGES (Gerigi Kertas Aesthetic Referensi 1 & 3) */
+    .scallop-top {
+      background: radial-gradient(circle at 10px -5px, transparent 12px, #ffffff 13px);
+      background-size: 20px 20px;
+      height: 12px;
+      width: 100%;
+    }
+    .scallop-bottom {
+      background: radial-gradient(circle at 10px 15px, transparent 12px, #ffffff 13px);
+      background-size: 20px 20px;
+      height: 12px;
+      width: 100%;
+    }
+
+    /* WASHI TAPE STICKERS */
+    .washi-tape-blue {
+      background: rgba(186, 224, 245, 0.85);
+      border-left: 3px dashed rgba(144, 200, 239, 0.6);
+      border-right: 3px dashed rgba(144, 200, 239, 0.6);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    }
+    .washi-tape-yellow {
+      background: rgba(247, 232, 172, 0.85);
+      border-left: 3px dashed rgba(240, 201, 98, 0.6);
+      border-right: 3px dashed rgba(240, 201, 98, 0.6);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    }
+
+    /* FLIPBOOK CONTAINER UPGRADE */
     .stpageflip-container {
-      box-shadow: 0 15px 30px rgba(15, 23, 42, 0.1);
-      border-radius: 12px;
+      box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.22);
+      border-radius: 16px;
       overflow: hidden;
       margin: 0 auto;
+      border: 4px solid #ffffff;
+      background: #ffffff;
     }
     .page-sheet {
-      background-color: #ffffff;
+      background-color: #FFFDF9;
       border: 1px solid #E2EEF9;
       padding: 24px;
       overflow-y: auto;
+      position: relative;
     }
+    .page-sheet::before {
+      content: "";
+      position: absolute;
+      top: 0; bottom: 0; left: 0;
+      width: 18px;
+      background: linear-gradient(to right, rgba(15, 23, 42, 0.08), transparent);
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    /* VINYL SPIN ANIMATION FOR MUSIC PLAYER */
+    @keyframes spinSlow {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    .animate-spin-slow {
+      animation: spinSlow 12s linear infinite;
+    }
+
+    /* FLOATING STICKERS ANIMATION */
+    @keyframes floatSticker {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-10px) rotate(4deg); }
+    }
+    .animate-float-1 { animation: floatSticker 4s ease-in-out infinite; }
+    .animate-float-2 { animation: floatSticker 5s ease-in-out infinite 1.5s; }
+    .animate-float-3 { animation: floatSticker 4.5s ease-in-out infinite 0.8s; }
   </style>
 </head>
-<body class="bg-pastel-offwhite text-pastel-navy font-sans antialiased overflow-x-hidden">
+<body class="bg-pastel-offwhite text-pastel-navy font-sans antialiased overflow-x-hidden selection:bg-pastel-powder selection:text-pastel-navy">
 
   <div id="root"></div>
 
   <script type="text/babel">
     const { useState, useRef, useEffect } = React;
 
-    // KONFIGURASI NAMA FILE (TANPA KARAKTER STRIP)
+    // PATH ASSETS (PURE NAMA FILE TANPA STRIP - PERSIS PERMINTAAN)
     const images = {
       profile: "public/assets/images/profilekalan.jpg",
       header: "public/assets/images/headerbanner.jpg",
@@ -100,14 +166,14 @@
     };
 
     const musicList = [
-      { id: 1, title: "Favorite Song 1", artist: "Artist 1", src: "public/assets/music/song1.mp3", cover: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=300" },
-      { id: 2, title: "Favorite Song 2", artist: "Artist 2", src: "public/assets/music/song2.mp3", cover: "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=300" },
-      { id: 3, title: "Favorite Song 3", artist: "Artist 3", src: "public/assets/music/song3.mp3", cover: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=300" }
+      { id: 1, title: "Favorite Song 1", artist: "Track #01", src: "public/assets/music/song1.mp3", cover: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=300" },
+      { id: 2, title: "Favorite Song 2", artist: "Track #02", src: "public/assets/music/song2.mp3", cover: "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=300" },
+      { id: 3, title: "Favorite Song 3", artist: "Track #03", src: "public/assets/music/song3.mp3", cover: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=300" }
     ];
 
     const videoList = [
-      { id: 1, title: "Special Moment 1", description: "Precious memory in motion.", src: "public/assets/videos/video1.mp4", thumbnail: "https://images.unsplash.com/photo-1518173946687-a4c8a383392e?w=600" },
-      { id: 2, title: "Graduation Highlight", description: "Celebrating your hard work!", src: "public/assets/videos/video2.mp4", thumbnail: "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=600" }
+      { id: 1, src: "public/assets/videos/video1.mp4", thumbnail: "https://images.unsplash.com/photo-1518173946687-a4c8a383392e?w=600" },
+      { id: 2, src: "public/assets/videos/video2.mp4", thumbnail: "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=600" }
     ];
 
     const lettersData = [
@@ -123,14 +189,34 @@
       { id: "j", title: "Open when you need a gentle reminder", content: "You matter, your feelings are completely valid, and you are doing so much better than you give yourself credit for. Be extra soft and kind to yourself today, because you are trying your best every single day, and that alone is something to be proud of." }
     ];
 
-    // KOMPONEN FOTO DENAN PLACEHOLDER
+    // SVG DEKORASI STIKER (REFERENSI 1 & 3)
+    const FlowerSticker = () => (
+      <svg className="w-8 h-8 text-pastel-powder animate-float-1" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 3a3 3 0 00-3 3 3 3 0 00-3-3 3 3 0 00-3 3 3 3 0 003 3 3 3 0 00-3 3 3 3 0 003 3 3 3 0 003-3 3 3 0 003 3 3 3 0 003-3 3 3 0 00-3-3 3 3 0 003-3 3 3 0 00-3-3z"/>
+      </svg>
+    );
+
+    const RibbonSticker = () => (
+      <svg className="w-7 h-7 text-pastel-baby animate-float-2" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 2a4 4 0 00-4 4c0 2 4 6 4 6s4-4 4-6a4 4 0 00-4-4zm-6 16l4-2-2 4 4-1-6-1zm12 0l-6 1 4 1-2-4 4 2z"/>
+      </svg>
+    );
+
+    const SparkleSticker = () => (
+      <svg className="w-6 h-6 text-pastel-yellow animate-float-3" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 0l2.5 8.5L23 11l-8.5 2.5L12 22l-2.5-8.5L1 11l8.5-2.5z"/>
+      </svg>
+    );
+
+    // KOMPONEN FOTO DENAN PLACEHOLDER AESTHETIC
     function ImageWithFallback({ src, alt, className = "" }) {
       const [error, setError] = useState(false);
       if (error || !src) {
         return (
-          <div className={`bg-pastel-blue/40 border-2 border-dashed border-pastel-powder rounded-2xl flex flex-col items-center justify-center p-6 text-center text-pastel-navy/70 ${className}`}>
-            <span className="text-xs font-semibold uppercase tracking-wider">Foto Belum Ada</span>
-            <span className="text-[10px] font-mono mt-1 text-pastel-navy/60 bg-white/60 px-2 py-0.5 rounded border border-pastel-powder/30">
+          <div className={`bg-pastel-blue/30 border-2 border-dashed border-pastel-powder/60 rounded-2xl flex flex-col items-center justify-center p-6 text-center text-pastel-navy/70 ${className}`}>
+            <span className="text-2xl mb-1">📷</span>
+            <span className="text-[11px] font-bold uppercase tracking-wider">Foto Belum Ada</span>
+            <span className="text-[9px] font-mono mt-1 text-pastel-navy/60 bg-white/80 px-2 py-0.5 rounded border border-pastel-powder/30">
               {src ? src.split('/').pop() : 'assets/images/...'}
             </span>
           </div>
@@ -139,7 +225,7 @@
       return <img src={src} alt={alt} onError={() => setError(true)} className={`object-contain max-w-full h-auto ${className}`} loading="lazy" />;
     }
 
-    // NAVBAR
+    // NAVBAR WITH SCRAPBOOK BADGE
     function Navbar() {
       const [isOpen, setIsOpen] = useState(false);
       const navItems = [
@@ -152,24 +238,26 @@
       ];
 
       return (
-        <header className="sticky top-4 z-50 max-w-6xl mx-auto px-4">
-          <nav className="bg-white/80 backdrop-blur-md rounded-full px-6 py-3 shadow-soft border border-pastel-powder/30 flex items-center justify-between">
-            <a href="#home" className="font-serif text-lg font-bold text-pastel-navy">Kalan's World ✨</a>
+        <header className="sticky top-4 z-50 max-w-5xl mx-auto px-4">
+          <nav className="bg-white/90 backdrop-blur-md rounded-full px-6 py-3 shadow-soft border-2 border-pastel-powder/40 flex items-center justify-between">
+            <a href="#home" className="font-serif text-lg font-bold text-pastel-navy flex items-center gap-2">
+              <span className="bg-pastel-blue px-2.5 py-0.5 rounded-full text-xs font-mono border border-pastel-powder/50">Kalan's World 🩵</span>
+            </a>
             <div className="hidden md:flex items-center gap-6">
               {navItems.map((item) => (
-                <a key={item.name} href={item.href} className="text-xs font-semibold text-pastel-navy/80 hover:text-pastel-powder transition-colors">
+                <a key={item.name} href={item.href} className="text-xs font-bold text-pastel-navy/80 hover:text-pastel-powder transition-colors">
                   {item.name}
                 </a>
               ))}
             </div>
-            <button onClick={() => setIsOpen(!isOpen)} className="md:hidden text-pastel-navy p-1">
+            <button onClick={() => setIsOpen(!isOpen)} className="md:hidden text-pastel-navy p-1 text-lg">
               {isOpen ? '✕' : '☰'}
             </button>
           </nav>
           {isOpen && (
-            <div className="md:hidden mt-2 bg-white/95 rounded-2xl p-4 border border-pastel-powder/30 shadow-lg flex flex-col gap-3 text-center">
+            <div className="md:hidden mt-2 bg-white/95 rounded-2xl p-4 border-2 border-pastel-powder/40 shadow-lg flex flex-col gap-2.5 text-center backdrop-blur-md">
               {navItems.map((item) => (
-                <a key={item.name} href={item.href} onClick={() => setIsOpen(false)} className="text-sm font-medium text-pastel-navy py-1">
+                <a key={item.name} href={item.href} onClick={() => setIsOpen(false)} className="text-sm font-semibold text-pastel-navy py-1.5 rounded-xl hover:bg-pastel-blue/40">
                   {item.name}
                 </a>
               ))}
@@ -179,84 +267,128 @@
       );
     }
 
-    // PROFILE HEADER (ALA TWITTER/X)
+    // PROFILE HEADER (TWITTER/X DASHBOARD STYLE - GENDER NEUTRAL)
     function ProfileHeader() {
       return (
-        <div id="memories" className="max-w-4xl mx-auto px-4 my-12">
-          <div className="bg-white/90 rounded-3xl overflow-hidden shadow-soft border-2 border-pastel-powder/40">
+        <div id="memories" className="max-w-4xl mx-auto px-4 my-14">
+          <div className="bg-white/95 rounded-3xl overflow-hidden shadow-soft border-2 border-pastel-powder/40 relative">
+            {/* Banner */}
             <div className="h-44 md:h-56 w-full bg-pastel-blue relative overflow-hidden">
               <ImageWithFallback src={images.header} alt="Header Banner" className="w-full h-full object-cover" />
+              <div className="absolute top-4 right-4 bg-white/80 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-mono font-bold text-pastel-navy border border-pastel-powder/40 shadow-sm">
+                OFFICIAL PROFILE 📌
+              </div>
             </div>
+
+            {/* Profile Content */}
             <div className="px-6 pb-6 relative">
               <div className="flex justify-between items-end -mt-16 md:-mt-20 mb-4">
-                <div className="w-28 h-28 md:w-36 md:h-36 rounded-full border-4 border-white overflow-hidden shadow-md bg-pastel-blue">
+                <div className="w-28 h-28 md:w-36 md:h-36 rounded-full border-4 border-white overflow-hidden shadow-polaroid bg-pastel-blue relative z-10">
                   <ImageWithFallback src={images.profile} alt="Kalan Profile" className="w-full h-full object-cover" />
                 </div>
-                <span className="bg-pastel-blue text-pastel-navy text-xs font-bold px-4 py-2 rounded-full border border-pastel-powder/50">
-                  ✨ Birthday & Grad Boy
-                </span>
+                
+                {/* GENDER NEUTRAL BADGES (NO BOY/GIRL) */}
+                <div className="flex items-center gap-2">
+                  <span className="bg-pastel-blue text-pastel-navy text-xs font-bold px-4 py-2 rounded-full border border-pastel-powder/50 shadow-sm">
+                    ✨ Birthday & Graduation 🎓
+                  </span>
+                </div>
               </div>
-              <h2 className="text-2xl font-bold font-serif text-pastel-navy">Kalan</h2>
-              <p className="text-xs text-pastel-navy/60 font-mono">@kalan</p>
-              <p className="text-sm text-pastel-navy/80 mt-3 leading-relaxed">
-                Living life one sweet memory at a time 🌿✨ Celebrating milestones, hard work, and good vibes.
-              </p>
+
+              <div>
+                <h2 className="text-2xl font-bold font-serif text-pastel-navy flex items-center gap-2">
+                  Kalan <span className="text-pastel-powder">✔</span>
+                </h2>
+                <p className="text-xs text-pastel-navy/60 font-mono">@kalan</p>
+
+                <p className="text-sm text-pastel-navy/80 mt-3 leading-relaxed font-sans max-w-2xl">
+                  Living life one sweet memory at a time 🌿✨ Celebrating milestones, hard work, and good vibes.
+                </p>
+
+                {/* Dashboard Stats Bar (Referensi 4) */}
+                <div className="grid grid-cols-3 gap-3 mt-6 pt-4 border-t border-pastel-powder/30 text-center">
+                  <div className="bg-pastel-blue/30 p-2.5 rounded-2xl border border-pastel-powder/30">
+                    <span className="block text-xs font-mono text-pastel-navy/60">CHAPTER</span>
+                    <span className="font-serif font-bold text-sm text-pastel-navy">New Degree 🎓</span>
+                  </div>
+                  <div className="bg-pastel-blue/30 p-2.5 rounded-2xl border border-pastel-powder/30">
+                    <span className="block text-xs font-mono text-pastel-navy/60">FRIENDSHIP</span>
+                    <span className="font-serif font-bold text-sm text-pastel-navy">2 Years+ 🩵</span>
+                  </div>
+                  <div className="bg-pastel-blue/30 p-2.5 rounded-2xl border border-pastel-powder/30">
+                    <span className="block text-xs font-mono text-pastel-navy/60">STATUS</span>
+                    <span className="font-serif font-bold text-sm text-pastel-navy">Blessed ✨</span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       );
     }
 
-    // BIRTHDAY GIFT SURPRISE
+    // BIRTHDAY GIFT SURPRISE (EXACT TEXT)
     function BirthdayGiftSection() {
       const [step, setStep] = useState('box');
 
       const handleOpenGift = () => {
         if (window.confetti) {
           window.confetti({
-            particleCount: 120,
-            spread: 80,
+            particleCount: 150,
+            spread: 100,
             origin: { y: 0.6 },
-            colors: ['#BAE0F5', '#90C8EF', '#E2EEF9', '#FFFFFF']
+            colors: ['#BAE0F5', '#90C8EF', '#E2EEF9', '#FFFFFF', '#F7E8AC']
           });
         }
         setStep('cake');
       };
 
       return (
-        <section id="birthday" className="max-w-4xl mx-auto px-4 py-16 text-center">
+        <section id="birthday" className="max-w-3xl mx-auto px-4 py-16 text-center">
           {step === 'box' && (
-            <div className="bg-white/90 p-8 md:p-12 rounded-3xl border-2 border-pastel-powder/40 shadow-soft max-w-lg mx-auto flex flex-col items-center gap-6">
-              <div className="w-20 h-20 bg-pastel-blue/60 rounded-full flex items-center justify-center text-3xl">🎁</div>
+            <div className="bg-white/95 p-8 md:p-12 rounded-3xl border-2 border-pastel-powder/40 shadow-soft max-w-lg mx-auto flex flex-col items-center gap-6 relative overflow-hidden">
+              <div className="washi-tape-yellow absolute -top-3 left-1/2 -translate-x-1/2 w-28 h-6 rounded-sm"></div>
+              <div className="w-24 h-24 bg-pastel-blue/60 rounded-full flex items-center justify-center text-4xl border-2 border-pastel-powder/50 shadow-sm animate-bounce mt-2">
+                🎁
+              </div>
               <div>
                 <h3 className="font-serif text-2xl md:text-3xl font-bold text-pastel-navy">A Special Gift For You</h3>
                 <p className="text-xs md:text-sm text-pastel-navy/70 mt-2">Something special is waiting inside. Are you ready?</p>
               </div>
-              <button onClick={handleOpenGift} className="bg-pastel-powder hover:bg-pastel-baby text-pastel-navy font-bold px-8 py-3.5 rounded-full shadow-md transition-transform hover:scale-105 border border-white text-sm">
+              <button 
+                onClick={handleOpenGift} 
+                className="bg-pastel-powder hover:bg-pastel-baby text-pastel-navy font-bold px-8 py-3.5 rounded-full shadow-md transition-all duration-300 hover:scale-105 border border-white text-sm"
+              >
                 Open Your Gift ✨
               </button>
             </div>
           )}
 
           {step === 'cake' && (
-            <div className="bg-white/90 p-8 md:p-12 rounded-3xl border-2 border-pastel-powder/40 shadow-soft max-w-xl mx-auto flex flex-col items-center gap-6">
-              <div className="max-w-xs w-full bg-pastel-blue/30 rounded-2xl p-4 border border-pastel-powder/30">
+            <div className="bg-white/95 p-8 md:p-12 rounded-3xl border-2 border-pastel-powder/40 shadow-soft max-w-xl mx-auto flex flex-col items-center gap-6 relative">
+              <div className="washi-tape-blue absolute -top-3 left-1/2 -translate-x-1/2 w-28 h-6 rounded-sm"></div>
+              <div className="max-w-xs w-full bg-pastel-blue/30 rounded-2xl p-4 border border-pastel-powder/30 relative shadow-polaroid rotate-1">
                 <ImageWithFallback src={images.birthdayCake} alt="Birthday Cake" className="w-full h-auto rounded-xl object-contain" />
               </div>
               <div>
                 <h3 className="font-serif text-3xl font-bold text-pastel-navy">Make a Wish!</h3>
                 <p className="text-xs md:text-sm text-pastel-navy/70 mt-2">Before reading your little surprise, here's a cake made for you.</p>
               </div>
-              <button onClick={() => setStep('message')} className="bg-pastel-powder hover:bg-pastel-baby text-pastel-navy font-bold px-8 py-3.5 rounded-full shadow-md transition-transform hover:scale-105 border border-white text-sm">
-                Continue ➔
+              <button 
+                onClick={() => setStep('message')} 
+                className="bg-pastel-powder hover:bg-pastel-baby text-pastel-navy font-bold px-8 py-3.5 rounded-full shadow-md transition-all duration-300 hover:scale-105 border border-white text-sm flex items-center gap-2"
+              >
+                <span>Continue</span> <span>➔</span>
               </button>
             </div>
           )}
 
           {step === 'message' && (
-            <div className="bg-white/95 p-8 md:p-12 rounded-3xl border-2 border-pastel-powder/40 shadow-soft max-w-2xl mx-auto text-left space-y-6">
-              <h3 className="font-serif text-2xl font-bold text-pastel-navy border-b border-pastel-powder/30 pb-4">
-                Happy Birthday, Kalan! 🎉
+            <div className="bg-white/95 p-8 md:p-12 rounded-3xl border-2 border-pastel-powder/40 shadow-soft max-w-2xl mx-auto text-left space-y-6 relative">
+              <div className="washi-tape-blue absolute -top-3 left-8 w-28 h-6 rounded-sm"></div>
+              <h3 className="font-serif text-2xl font-bold text-pastel-navy border-b border-pastel-powder/30 pb-4 flex items-center justify-between">
+                <span>Happy Birthday, Kalan! 🎉</span>
+                <span className="text-xs font-mono font-normal text-pastel-navy/50">01 / SURPRISE</span>
               </h3>
               <div className="text-sm md:text-base text-pastel-navy/80 leading-relaxed space-y-4 font-sans whitespace-pre-line">
                 {`Happy birthday, Kalan! I wanted to take a moment to tell you how truly happy I am that you were born. The world is honestly a much brighter, softer, and kinder place simply because you exist in it. Having you as a friend over these past two years has been one of the sweetest blessings in my life, and I am so thankful that our paths crossed.
@@ -275,7 +407,7 @@ You deserve every single sweet thing this world has to offer, Kalan. Take time t
       );
     }
 
-    // GRADUATION FLIPBOOK (DENGAN STPAGEFLIP MEMBALIK HALAMAN BUKU FISIK)
+    // GRADUATION FLIPBOOK (UPGRADED VISUAL SCRAPBOOK)
     function GraduationFlipbookSection() {
       const bookContainerRef = useRef(null);
       const pageFlipRef = useRef(null);
@@ -284,8 +416,8 @@ You deserve every single sweet thing this world has to offer, Kalan. Take time t
         if (bookContainerRef.current && window.St && window.St.PageFlip) {
           const isMobile = window.innerWidth < 768;
           const pageFlip = new window.St.PageFlip(bookContainerRef.current, {
-            width: isMobile ? 320 : 380,
-            height: isMobile ? 460 : 520,
+            width: isMobile ? 310 : 380,
+            height: isMobile ? 470 : 530,
             size: "fixed",
             minWidth: 280,
             maxWidth: 420,
@@ -307,33 +439,38 @@ You deserve every single sweet thing this world has to offer, Kalan. Take time t
       return (
         <section id="graduation" className="max-w-5xl mx-auto px-4 py-16 text-center">
           <div className="mb-8">
-            <span className="bg-pastel-blue/60 text-pastel-navy px-4 py-1.5 rounded-full border border-pastel-powder/40 text-xs font-semibold">📖 Graduation Flipbook</span>
-            <h2 className="font-serif text-3xl md:text-4xl font-bold text-pastel-navy mt-2">Graduation Memory Book</h2>
-            <p className="text-xs text-pastel-navy/60 mt-1">Buka dan geser lembaran buku untuk membaca pesan graduation!</p>
+            <span className="bg-pastel-blue/60 text-pastel-navy px-4 py-1.5 rounded-full border border-pastel-powder/40 text-xs font-semibold">🎓 Interactive Memory Scrapbook</span>
+            <h2 className="font-serif text-3xl md:text-4xl font-bold text-pastel-navy mt-2">Graduation Flipbook</h2>
+            <p className="text-xs text-pastel-navy/60 mt-1">Halaman dapat ditarik/dibalik seperti buku fisik asli!</p>
           </div>
 
           <div className="flex justify-center items-center my-6">
             <div ref={bookContainerRef} className="stpageflip-container">
+              
               {/* PAGE 1: COVER */}
               <div className="page-sheet flex flex-col items-center justify-center text-center space-y-4">
-                <div className="w-full h-64 rounded-2xl overflow-hidden bg-pastel-blue/30 p-2 border border-pastel-powder/20">
+                <div className="washi-tape-blue absolute top-3 left-1/2 -translate-x-1/2 w-28 h-6 rounded-sm"></div>
+                <div className="w-full h-64 rounded-2xl overflow-hidden bg-pastel-blue/30 p-2 border border-pastel-powder/30">
                   <ImageWithFallback src={images.flipbookOpening} alt="Opening" className="w-full h-full object-contain" />
                 </div>
                 <h3 className="font-serif text-xl font-bold text-pastel-navy">A little celebration of your hard work.</h3>
-                <p className="text-xs text-pastel-navy/60 font-mono">← Swipe/Drag to Flip →</p>
+                <span className="text-[10px] bg-pastel-blue text-pastel-navy px-3 py-1 rounded-full font-mono">← Drag or Swipe to Flip →</span>
               </div>
 
               {/* PAGE 2: GRADUATION PHOTO */}
               <div className="page-sheet flex flex-col items-center justify-center">
-                <div className="w-full h-full rounded-2xl overflow-hidden bg-pastel-blue/20 p-2 border border-pastel-powder/20 flex items-center justify-center">
+                <div className="washi-tape-yellow absolute top-4 left-6 w-20 h-5 rounded-sm -rotate-6"></div>
+                <div className="w-full h-full rounded-2xl overflow-hidden bg-pastel-blue/20 p-2 border border-pastel-powder/30 flex items-center justify-center">
                   <ImageWithFallback src={images.graduation} alt="Graduation Photo" className="w-full h-full object-contain" />
                 </div>
               </div>
 
               {/* PAGE 3: GRADUATION MESSAGE */}
               <div className="page-sheet text-left space-y-3">
-                <h4 className="font-serif text-lg font-bold text-pastel-navy border-b border-pastel-powder/20 pb-2">Graduation Message 🎓</h4>
-                <p className="text-xs text-pastel-navy/80 leading-relaxed font-sans whitespace-pre-line">
+                <h4 className="font-serif text-base font-bold text-pastel-navy border-b border-pastel-powder/30 pb-2 flex items-center justify-between">
+                  <span>Graduation Message</span> 🎓
+                </h4>
+                <p className="text-[11px] leading-relaxed text-pastel-navy/80 font-sans whitespace-pre-line">
                   {`Happy graduation, Kalan! You finally did it! Seeing you reach this incredible milestone and officially earn your degree makes me so ridiculously proud of you. You put in the time, the focus, and the effort, and now you are standing on the other side of all that hard work with a degree that proves just how capable you are.
 
 I know how many exhausting nights, stressful deadlines, and quiet sacrifices went into making this day happen. All those moments where you felt tired, overwhelmed, or wondered if it would ever end were not in vain. You fought through every obstacle, and you earned every single bit of this success through your own grit and determination.
@@ -346,16 +483,19 @@ Honestly, watching your journey from afar over these past two years has been suc
 
               {/* PAGE 4: FRIENDSHIP PHOTO */}
               <div className="page-sheet flex flex-col items-center justify-center">
-                <div className="w-full h-full rounded-2xl overflow-hidden bg-pastel-blue/20 p-2 border border-pastel-powder/20 flex items-center justify-center">
+                <div className="washi-tape-blue absolute top-4 right-6 w-20 h-5 rounded-sm rotate-6"></div>
+                <div className="w-full h-full rounded-2xl overflow-hidden bg-pastel-blue/20 p-2 border border-pastel-powder/30 flex items-center justify-center">
                   <ImageWithFallback src={images.friendship} alt="Friendship Photo" className="w-full h-full object-contain" />
                 </div>
               </div>
 
               {/* PAGE 5: FRIENDSHIP MESSAGE */}
               <div className="page-sheet text-left space-y-3">
-                <h4 className="font-serif text-lg font-bold text-pastel-navy border-b border-pastel-powder/20 pb-2">A Note on Friendship 🩵</h4>
-                <p className="text-xs text-pastel-navy/80 leading-relaxed font-sans whitespace-pre-line">
-                  {`Halooooo Kalan, makasih ya udah mau jadi temen gue kurang lebih 2 tahun ini. Honest speaking, gue gatau apakah lu bakal mengingat gue seperti gue mengingat lu atau enggaa, tapi satu hal yang pasti, gue sangat amat bersyukur karena bisa kenalan dan berteman sama lu. (Beneran ga boong)
+                <h4 className="font-serif text-base font-bold text-pastel-navy border-b border-pastel-powder/30 pb-2 flex items-center justify-between">
+                  <span>A Note on Friendship</span> 🩵
+                </h4>
+                <p className="text-[11px] leading-relaxed text-pastel-navy/80 font-sans whitespace-pre-line">
+                  {`Halooooo Kalan, makasih ya udah mau jadi temen gue kurang lebih 2 tahun ini. Honest speaking, gue gatau apakah lu bakal mengingat gue seperti gue mengingat lu atau enggaa, tapi satu hal yang pasti, gue sangat amat bersyukur karena bisa kenalan dan berteman sama lu. (Beneran ga boong) 
 
 Gue sadar kita mungkin ga bisa selamanya berteman atau ngobrol tiap hari. Tapi walaupun pertemanan kita ini tergolong low maintenance, sosok lu tuh beneran berkesan banget buat gue🥺✌🏻. Tipe pertemanan yang biarpun kita jarang main atau jarang kontek-kontekan, tempat lu di ingatan gue bakal tetep hangat dan bener-bener ga bisa gue lupain gitu ajaaa.
 
@@ -365,20 +505,21 @@ Makasih banyak ya udah mau temenan sama gue. Makasih udah dengerin cerita-cerita
 
               {/* PAGE 6: CLOSING */}
               <div className="page-sheet flex flex-col items-center justify-center text-center space-y-4">
-                <div className="w-full h-56 rounded-2xl overflow-hidden bg-pastel-blue/30 p-2 border border-pastel-powder/20">
+                <div className="w-full h-56 rounded-2xl overflow-hidden bg-pastel-blue/30 p-2 border border-pastel-powder/30">
                   <ImageWithFallback src={images.flipbookClosing} alt="Closing" className="w-full h-full object-contain" />
                 </div>
                 <h3 className="font-serif text-xl font-bold text-pastel-navy">Once again, congratulations!</h3>
                 <p className="text-xs text-pastel-navy/70">Your journey is just beginning. Keep growing, keep dreaming, and keep being you.</p>
               </div>
+
             </div>
           </div>
 
-          <div className="flex justify-center gap-4 mt-4">
-            <button onClick={flipPrev} className="bg-white hover:bg-pastel-blue text-pastel-navy font-bold px-6 py-2 rounded-full border border-pastel-powder/40 shadow-sm text-xs">
+          <div className="flex justify-center gap-4 mt-6">
+            <button onClick={flipPrev} className="bg-white hover:bg-pastel-blue text-pastel-navy font-bold px-6 py-2.5 rounded-full border border-pastel-powder/40 shadow-sm text-xs transition-all">
               ← Prev Page
             </button>
-            <button onClick={flipNext} className="bg-white hover:bg-pastel-blue text-pastel-navy font-bold px-6 py-2 rounded-full border border-pastel-powder/40 shadow-sm text-xs">
+            <button onClick={flipNext} className="bg-white hover:bg-pastel-blue text-pastel-navy font-bold px-6 py-2.5 rounded-full border border-pastel-powder/40 shadow-sm text-xs transition-all">
               Next Page →
             </button>
           </div>
@@ -386,7 +527,7 @@ Makasih banyak ya udah mau temenan sama gue. Makasih udah dengerin cerita-cerita
       );
     }
 
-    // OPEN WHEN LETTERS (10 SURAT)
+    // OPEN WHEN LETTERS (10 SURAT IMPOR SERBA AESTHETIC)
     function OpenWhenLettersSection() {
       const [selectedLetter, setSelectedLetter] = useState(null);
 
@@ -395,6 +536,7 @@ Makasih banyak ya udah mau temenan sama gue. Makasih udah dengerin cerita-cerita
           <div className="mb-8">
             <span className="bg-pastel-blue/60 text-pastel-navy px-4 py-1.5 rounded-full border border-pastel-powder/40 text-xs font-semibold">✉️ Open When Letters</span>
             <h2 className="font-serif text-3xl md:text-4xl font-bold text-pastel-navy mt-2">10 Special Envelopes</h2>
+            <p className="text-xs text-pastel-navy/60 mt-1">Klik salah satu amplop untuk membaca pesan personal.</p>
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
@@ -402,9 +544,11 @@ Makasih banyak ya udah mau temenan sama gue. Makasih udah dengerin cerita-cerita
               <button
                 key={letter.id}
                 onClick={() => setSelectedLetter(letter)}
-                className="bg-white hover:bg-pastel-blue/40 p-4 rounded-2xl border-2 border-pastel-powder/40 shadow-soft flex flex-col items-center gap-2 text-center transition-all duration-300 hover:-translate-y-1"
+                className="bg-white hover:bg-pastel-blue/40 p-4 rounded-2xl border-2 border-pastel-powder/40 shadow-soft flex flex-col items-center gap-2 text-center transition-all duration-300 hover:-translate-y-1.5 group relative overflow-hidden"
               >
-                <div className="w-10 h-10 bg-pastel-blue rounded-full flex items-center justify-center text-lg">✉️</div>
+                <div className="w-10 h-10 bg-pastel-blue rounded-full flex items-center justify-center text-lg group-hover:scale-110 transition-transform">
+                  ✉️
+                </div>
                 <span className="font-serif text-xs font-bold text-pastel-navy line-clamp-2">{letter.title}</span>
               </button>
             ))}
@@ -413,14 +557,14 @@ Makasih banyak ya udah mau temenan sama gue. Makasih udah dengerin cerita-cerita
           {selectedLetter && (
             <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4">
               <div className="bg-white rounded-3xl p-6 md:p-8 max-w-lg w-full border-2 border-pastel-powder shadow-2xl text-left relative">
-                <button onClick={() => setSelectedLetter(null)} className="absolute top-4 right-4 text-gray-400 hover:text-black">✕</button>
-                <span className="text-xs font-semibold uppercase text-pastel-powder">Envelope #{selectedLetter.id.toUpperCase()}</span>
+                <button onClick={() => setSelectedLetter(null)} className="absolute top-4 right-4 text-pastel-navy/50 hover:text-pastel-navy text-lg font-bold">✕</button>
+                <span className="text-xs font-semibold uppercase tracking-wider text-pastel-powder font-mono">Envelope #{selectedLetter.id.toUpperCase()}</span>
                 <h3 className="font-serif text-xl font-bold text-pastel-navy my-2 border-b border-pastel-powder/30 pb-2">{selectedLetter.title}</h3>
-                <div className="bg-pastel-blue/20 p-4 rounded-2xl border border-pastel-powder/30 text-sm text-pastel-navy/80 leading-relaxed font-sans">
+                <div className="bg-pastel-blue/20 p-5 rounded-2xl border border-pastel-powder/30 text-sm text-pastel-navy/80 leading-relaxed font-sans">
                   {selectedLetter.content}
                 </div>
                 <div className="mt-6 text-right">
-                  <button onClick={() => setSelectedLetter(null)} className="bg-pastel-powder hover:bg-pastel-baby text-pastel-navy text-xs font-bold px-6 py-2 rounded-full">
+                  <button onClick={() => setSelectedLetter(null)} className="bg-pastel-powder hover:bg-pastel-baby text-pastel-navy text-xs font-bold px-6 py-2.5 rounded-full shadow-sm">
                     Close Letter
                   </button>
                 </div>
@@ -431,7 +575,7 @@ Makasih banyak ya udah mau temenan sama gue. Makasih udah dengerin cerita-cerita
       );
     }
 
-    // MEDIA SECTION (3 MUSIK + 2 VIDEO)
+    // MEDIA SECTION (3 MUSIK + 2 VIDEO MURNI TANPA JUDUL)
     function MediaSection() {
       const [currentSong, setCurrentSong] = useState(musicList[0]);
       const [isPlaying, setIsPlaying] = useState(false);
@@ -455,15 +599,21 @@ Makasih banyak ya udah mau temenan sama gue. Makasih udah dengerin cerita-cerita
           </div>
 
           {/* Pemutar Musik */}
-          <div className="bg-white/90 p-6 rounded-3xl border-2 border-pastel-powder/40 shadow-soft max-w-xl mx-auto mb-10">
+          <div className="bg-white/90 p-6 rounded-3xl border-2 border-pastel-powder/40 shadow-soft max-w-xl mx-auto mb-12 relative overflow-hidden">
+            <div className="washi-tape-blue absolute -top-3 left-1/2 -translate-x-1/2 w-28 h-6 rounded-sm"></div>
             <audio ref={audioRef} src={currentSong.src} onEnded={() => setIsPlaying(false)} />
-            <div className="flex flex-col sm:flex-row items-center gap-4">
-              <img src={currentSong.cover} className="w-20 h-20 rounded-2xl object-cover" />
+            <div className="flex flex-col sm:flex-row items-center gap-5 mt-2">
+              {/* Vinyl cover effect */}
+              <div className="relative">
+                <img src={currentSong.cover} className={`w-24 h-24 rounded-full object-cover shadow-md border-2 border-white ${isPlaying ? 'animate-spin-slow' : ''}`} />
+                <div className="w-6 h-6 bg-white rounded-full absolute inset-0 m-auto border-2 border-pastel-powder"></div>
+              </div>
+
               <div className="flex-1 text-center sm:text-left">
                 <h4 className="font-serif text-base font-bold text-pastel-navy">{currentSong.title}</h4>
-                <p className="text-xs text-pastel-navy/60">{currentSong.artist}</p>
+                <p className="text-xs text-pastel-navy/60 font-mono">{currentSong.artist}</p>
                 <div className="flex items-center justify-center sm:justify-start gap-3 mt-3">
-                  <button onClick={togglePlay} className="bg-pastel-powder hover:bg-pastel-baby px-5 py-1.5 rounded-full text-xs font-bold text-pastel-navy">
+                  <button onClick={togglePlay} className="bg-pastel-powder hover:bg-pastel-baby px-5 py-2 rounded-full text-xs font-bold text-pastel-navy shadow-sm transition-all">
                     {isPlaying ? 'Pause ⏸' : 'Play ▶'}
                   </button>
                   <select 
@@ -474,7 +624,7 @@ Makasih banyak ya udah mau temenan sama gue. Makasih udah dengerin cerita-cerita
                         setIsPlaying(false);
                       }
                     }}
-                    className="text-xs border border-pastel-powder/50 rounded-lg px-2 py-1 bg-white text-pastel-navy"
+                    className="text-xs border border-pastel-powder/50 rounded-xl px-3 py-1.5 bg-white text-pastel-navy font-medium shadow-sm outline-none"
                   >
                     {musicList.map(s => <option key={s.id} value={s.id}>{s.title}</option>)}
                   </select>
@@ -483,15 +633,13 @@ Makasih banyak ya udah mau temenan sama gue. Makasih udah dengerin cerita-cerita
             </div>
           </div>
 
-          {/* Galeri Video */}
+          {/* GALERI VIDEO (MURNI VIDEO - TANPA JUDUL ATAU DESKRIPSI TEKS DI BAWAHNYA) */}
           <div className="grid md:grid-cols-2 gap-6">
             {videoList.map((video) => (
-              <div key={video.id} className="bg-white/90 p-4 rounded-3xl border-2 border-pastel-powder/40 shadow-soft">
-                <div className="aspect-video rounded-2xl overflow-hidden bg-slate-900 mb-3">
+              <div key={video.id} className="bg-white/95 p-3 rounded-3xl border-2 border-pastel-powder/40 shadow-soft overflow-hidden">
+                <div className="aspect-video rounded-2xl overflow-hidden bg-slate-900">
                   <video src={video.src} poster={video.thumbnail} controls className="w-full h-full object-contain" />
                 </div>
-                <h4 className="font-serif text-base font-bold text-pastel-navy">{video.title}</h4>
-                <p className="text-xs text-pastel-navy/70 mt-1">{video.description}</p>
               </div>
             ))}
           </div>
@@ -505,14 +653,29 @@ Makasih banyak ya udah mau temenan sama gue. Makasih udah dengerin cerita-cerita
         <div className="min-h-screen flex flex-col font-sans">
           <Navbar />
           <main className="flex-1">
-            <section id="home" className="min-h-[75vh] flex flex-col items-center justify-center text-center px-4 py-12">
-              <span className="bg-pastel-blue/60 text-pastel-navy px-4 py-1.5 rounded-full border border-pastel-powder/40 text-xs font-semibold mb-3">Hi, Kalan! ✨</span>
-              <h1 className="font-serif text-4xl md:text-6xl font-bold text-pastel-navy">A Little World Made Just For You</h1>
-              <p className="text-sm md:text-base text-pastel-navy/70 max-w-lg mx-auto mt-3">A digital memory scrapbook celebrating your birthday and graduation journey.</p>
-              <div className="max-w-xs mx-auto my-6 p-3 bg-white rounded-3xl shadow-soft border-2 border-pastel-powder/40">
+            {/* HERO SECTION */}
+            <section id="home" className="min-h-[80vh] flex flex-col items-center justify-center text-center px-4 py-12 relative overflow-hidden">
+              <div className="absolute top-12 left-10 text-pastel-powder opacity-80"><FlowerSticker /></div>
+              <div className="absolute bottom-16 left-16 text-pastel-baby opacity-80"><RibbonSticker /></div>
+              <div className="absolute top-16 right-12 text-pastel-yellow opacity-90"><SparkleSticker /></div>
+
+              <span className="bg-pastel-blue/80 text-pastel-navy px-4 py-1.5 rounded-full border border-pastel-powder/50 text-xs font-bold mb-3 shadow-sm">
+                Hi, Kalan! ✨
+              </span>
+              <h1 className="font-serif text-4xl md:text-6xl font-bold text-pastel-navy tracking-tight leading-tight">
+                A Little World Made Just For You
+              </h1>
+              <p className="text-sm md:text-base text-pastel-navy/70 max-w-lg mx-auto mt-3 font-sans">
+                A digital memory scrapbook celebrating your birthday and graduation journey.
+              </p>
+
+              {/* Main Polaroid Frame */}
+              <div className="max-w-xs mx-auto my-8 p-3 bg-white rounded-3xl shadow-polaroid border-2 border-pastel-powder/40 rotate-1 hover:rotate-0 transition-transform duration-300 relative">
+                <div className="washi-tape-blue absolute -top-3 left-1/2 -translate-x-1/2 w-24 h-6 rounded-sm"></div>
                 <ImageWithFallback src={images.homepage} alt="Kalan Main" className="w-full h-auto rounded-2xl object-cover" />
               </div>
-              <a href="#birthday" className="bg-pastel-powder hover:bg-pastel-baby text-pastel-navy font-bold text-sm px-8 py-3.5 rounded-full shadow-md">
+
+              <a href="#birthday" className="bg-pastel-powder hover:bg-pastel-baby text-pastel-navy font-bold text-sm px-8 py-3.5 rounded-full shadow-md transition-all duration-300 hover:scale-105 border border-white">
                 Explore Your Surprise ✨
               </a>
             </section>
@@ -524,12 +687,13 @@ Makasih banyak ya udah mau temenan sama gue. Makasih udah dengerin cerita-cerita
             <OpenWhenLettersSection />
           </main>
 
-          <footer className="mt-20 py-10 bg-white/80 border-t border-pastel-powder/30 text-center">
-            <div className="max-w-md mx-auto px-4 flex flex-col items-center gap-2">
-              <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-pastel-powder">
+          {/* FOOTER */}
+          <footer className="mt-20 py-10 bg-white/90 border-t-2 border-pastel-powder/30 text-center relative">
+            <div className="max-w-md mx-auto px-4 flex flex-col items-center gap-2.5">
+              <div className="w-12 h-12 rounded-2xl overflow-hidden border-2 border-pastel-powder shadow-sm">
                 <ImageWithFallback src={images.footer} alt="Carmen" className="w-full h-full object-cover" />
               </div>
-              <p className="font-serif text-sm font-semibold text-pastel-navy">dari <span className="text-pastel-powder">@carmencakep</span></p>
+              <p className="font-serif text-sm font-semibold text-pastel-navy">dari <span className="text-pastel-powder font-bold">@carmencakep</span></p>
               <p className="text-xs text-pastel-navy/60">Made with 🩵 just for you.</p>
             </div>
           </footer>
